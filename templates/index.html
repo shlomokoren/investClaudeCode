@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Stock Price vs SMA150</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+  <style>
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      margin: 0;
+      padding: 20px;
+      background: #f5f7fa;
+      color: #1a1a1a;
+    }
+    h1 {
+      margin-top: 0;
+    }
+    .controls {
+      background: #fff;
+      padding: 16px;
+      border-radius: 8px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      align-items: end;
+      margin-bottom: 20px;
+    }
+    .controls label {
+      display: flex;
+      flex-direction: column;
+      font-size: 13px;
+      color: #555;
+    }
+    .controls input,
+    .controls select {
+      margin-top: 4px;
+      padding: 8px 10px;
+      font-size: 14px;
+      border: 1px solid #d0d5dd;
+      border-radius: 6px;
+      min-width: 100px;
+    }
+    .controls input[name="tickers"] {
+      min-width: 320px;
+    }
+    .controls button {
+      padding: 9px 18px;
+      font-size: 14px;
+      border: none;
+      border-radius: 6px;
+      background: #2563eb;
+      color: #fff;
+      cursor: pointer;
+    }
+    .controls button:hover {
+      background: #1d4ed8;
+    }
+    .controls button:disabled {
+      background: #94a3b8;
+      cursor: wait;
+    }
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(440px, 1fr));
+      gap: 20px;
+    }
+    .card {
+      background: #fff;
+      padding: 16px;
+      border-radius: 8px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+    }
+    .card h2 {
+      margin: 0 0 12px 0;
+      font-size: 18px;
+    }
+    .card .error {
+      color: #b91c1c;
+      font-size: 14px;
+    }
+    .status {
+      color: #475569;
+      font-size: 14px;
+      margin-bottom: 10px;
+    }
+  </style>
+</head>
+<body>
+  <h1>Stock Price vs SMA150</h1>
+
+  <form class="controls" id="controls">
+    <label>
+      Tickers (comma-separated)
+      <input type="text" name="tickers" value="{{ default_stocks }}" />
+    </label>
+    <label>
+      Range
+      <select name="range">
+        <option value="1mo">1 month</option>
+        <option value="3mo">3 months</option>
+        <option value="6mo">6 months</option>
+        <option value="1y">1 year</option>
+      </select>
+    </label>
+    <button type="submit" id="loadBtn">Load</button>
+  </form>
+
+  <div class="status" id="status"></div>
+  <div class="grid" id="grid"></div>
+
+  <script>
+    function formatVolume(v) {
+      if (v >= 1e9) return (v / 1e9).toFixed(1) + 'B';
+      if (v >= 1e6) return (v / 1e6).toFixed(1) + 'M';
+      if (v >= 1e3) return (v / 1e3).toFixed(1) + 'K';
+      return v;
+    }
+
+    const defaultRange = "{{ default_range }}";
+    const rangeSelect = document.querySelector('select[name="range"]');
+    rangeSelect.value = defaultRange;
+
+    const form = document.getElementById('controls');
+    const grid = document.getElementById('grid');
+    const status = document.getElementById('status');
+    const loadBtn = document.getElementById('loadBtn');
+    const charts = new Map();
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      await loadData();
+    });
+
+    async function loadData() {
+      const tickers = form.tickers.value.trim();
+      const range = form.range.value;
+      if (!tickers) return;
+
+      loadBtn.disabled = true;
+      status.textContent = 'Loading…';
+
+      try {
+        const resp = await fetch(`/api/stocks?tickers=${encodeURIComponent(tickers)}&range=${range}`);
+        const data = await resp.json();
+        if (!resp.ok) throw new Error(data.error || 'Request failed');
+        renderCharts(data.stocks);
+        status.textContent = `Showing ${data.stocks.length} stock(s) over ${range}.`;
+      } catch (err) {
+        status.textContent = `Error: ${err.message}`;
+      } finally {
+        loadBtn.disabled = false;
+      }
+    }
+
+    function renderCharts(stocks) {
+      // destroy old charts
+      for (const c of charts.values()) c.destroy();
+      charts.clear();
+      grid.innerHTML = '';
+
+      for (const s of stocks) {
+        const card = document.createElement('div');
+        card.className = 'card';
+        const title = document.createElement('h2');
+        const nameSuffix = s.name && s.name !== s.ticker ? ` — ${s.name}` : '';
+        title.textContent = `${s.ticker}${nameSuffix}`;
+        card.appendChild(title);
+
+        if (s.error) {
+          const err = document.createElement('div');
+          err.className = 'error';
+          err.textContent = s.error;
+          card.appendChild(err);
+          grid.appendChild(card);
+          continue;
+        }
+
+        const canvas = document.createElement('canvas');
+        canvas.height = 240;
+        card.appendChild(canvas);
+        grid.appendChild(card);
+
+        const chart = new Chart(canvas, {
+          data: {
+            labels: s.dates,
+            datasets: [
+              {
+                type: 'line',
+                label: 'Price',
+                data: s.prices,
+                borderColor: '#2563eb',
+                backgroundColor: 'transparent',
+                borderWidth: 2,
+                pointRadius: 0,
+                tension: 0,
+                yAxisID: 'yPrice',
+                order: 1,
+              },
+              {
+                type: 'line',
+                label: 'SMA150',
+                data: s.sma150,
+                borderColor: '#ea580c',
+                backgroundColor: 'transparent',
+                borderWidth: 2,
+                pointRadius: 0,
+                tension: 0,
+                yAxisID: 'yPrice',
+                order: 2,
+              },
+              {
+                type: 'bar',
+                label: 'Volume',
+                data: s.volumes,
+                backgroundColor: 'rgba(148, 163, 184, 0.45)',
+                borderWidth: 0,
+                yAxisID: 'yVolume',
+                order: 3,
+              },
+            ],
+          },
+          options: {
+            responsive: true,
+            interaction: { mode: 'index', intersect: false },
+            plugins: {
+              legend: { position: 'top' },
+              tooltip: {
+                enabled: true,
+                callbacks: {
+                  label: (ctx) => {
+                    const v = ctx.parsed.y;
+                    if (ctx.dataset.label === 'Volume') {
+                      return `Volume: ${v.toLocaleString()}`;
+                    }
+                    return `${ctx.dataset.label}: $${v}`;
+                  },
+                  footer: (items) => {
+                    if (!items.length) return '';
+                    const i = items[0].dataIndex;
+                    const price = s.prices[i];
+                    const sma = s.sma150[i];
+                    if (price == null || sma == null || sma === 0) return 'Diff%: n/a';
+                    const diff = ((price - sma) / sma) * 100;
+                    const sign = diff >= 0 ? '+' : '';
+                    return `Diff%: ${sign}${diff.toFixed(2)}%`;
+                  },
+                },
+              },
+            },
+            scales: {
+              x: { ticks: { maxTicksLimit: 8, autoSkip: true } },
+              yPrice: {
+                type: 'linear',
+                position: 'left',
+                ticks: { callback: (v) => '$' + v },
+              },
+              yVolume: {
+                type: 'linear',
+                position: 'right',
+                grid: { drawOnChartArea: false },
+                ticks: { callback: (v) => formatVolume(v) },
+              },
+            },
+          },
+        });
+        charts.set(s.ticker, chart);
+      }
+    }
+
+    // initial load
+    loadData();
+  </script>
+</body>
+</html>
