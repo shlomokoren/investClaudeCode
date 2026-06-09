@@ -1,0 +1,13 @@
+services:
+  - type: web
+    name: invest-app
+    runtime: python
+    plan: free
+    buildCommand: pip install -r requirements.txt
+    startCommand: gunicorn app:app --bind 0.0.0.0:$PORT --workers 2 --timeout 120
+    healthCheckPath: /
+    envVars:
+      - key: PYTHON_VERSION
+        value: "3.12.4"
+      - key: DEBUG
+        value: "false"

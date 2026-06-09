@@ -1,4 +1,4 @@
 {
-  "default_stocks": ["AAPL", "ADBE", "AMD", "AMZN", "ARKW", "MSFT", "AFRM","ASML"],
+  "default_stocks": ["AAPL", "ADBE", "AMD", "AMZN", "ARKW", "MSFT", "AFRM","ASML","UBER"],
   "default_range": "1y"
 }

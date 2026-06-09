@@ -1,0 +1,14 @@
+# Externalizes config.json so it can be changed without rebuilding the image.
+# Mounted into the container at /app/config.json (see deployment.yaml).
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: invest-app-config
+  labels:
+    app: invest-app
+data:
+  config.json: |
+    {
+      "default_stocks": ["AAPL", "ADBE", "AMD", "AMZN", "ARKW", "MSFT", "AFRM", "ASML"],
+      "default_range": "1y"
+    }

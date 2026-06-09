@@ -1,0 +1,23 @@
+# Standard Kubernetes route object. Requires an Ingress controller (e.g. nginx).
+# Change the host to a domain that points at your cluster's ingress IP.
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: invest-app
+  labels:
+    app: invest-app
+  annotations:
+    nginx.ingress.kubernetes.io/rewrite-target: /
+spec:
+  ingressClassName: nginx
+  rules:
+    - host: invest-app.local
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: invest-app
+                port:
+                  number: 80
