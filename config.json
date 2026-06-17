@@ -1,4 +1,8 @@
 {
-  "default_stocks": ["AAPL", "ADBE", "AMD", "AMZN", "ARKW", "MSFT", "AFRM","ASML","UBER"],
-  "default_range": "1y"
+  "default_stocks": ["AAPL", "ADBE", "AMD", "AMZN", "ARKW", "MSFT", "AFRM","ASML","UBER","RDDT"],
+  "default_range": "1y",
+  "alerts": {
+    "to_list": ["shlomo.koren@gmail.com"],
+    "from": "investClaudeCode@mokdosoft.com"
+  }
 }
