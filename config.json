@@ -1,6 +1,6 @@
 {
   "default_stocks": ["AMD", "AMZN", "ARKW", "RDDT", "SOFI", 
-    "MSFT", "AFRM","ASML","UBER","NVDA","META","AAPL", "ADBE","MU"],
+    "MSFT", "AFRM","ASML","UBER","NVDA","META","AAPL", "ADBE","MU","NOW"],
   "default_range": "1y",
   "alerts": {
     "to_list": ["shlomo.koren@gmail.com"],
