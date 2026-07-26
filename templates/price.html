@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+{% block title %}Price vs SMA150{% endblock %}
+{% block content %}
+<h1>Stock Price vs SMA150</h1>
+
+<div class="symbol-chips" id="symbolChips">
+  {% for sym in symbols %}
+  <button type="button" class="chip" data-symbol="{{ sym }}">{{ sym }}</button>
+  {% endfor %}
+</div>
+
+<form class="price-controls" id="controls">
+  <label>
+    Tickers (comma-separated)
+    <input type="text" name="tickers" value="{{ default_stocks }}" />
+  </label>
+  <label>
+    Range
+    <select name="range">
+      <option value="1mo">1 month</option>
+      <option value="3mo">3 months</option>
+      <option value="6mo">6 months</option>
+      <option value="1y">1 year</option>
+    </select>
+  </label>
+  <button type="submit" id="loadBtn">Load</button>
+</form>
+
+<div class="status" id="status"></div>
+<div class="grid" id="grid"></div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+  window.DEFAULT_RANGE = "{{ default_range }}";
+</script>
+<script src="{{ url_for('static', filename='js/price.js') }}"></script>
+{% endblock %}

@@ -1,0 +1,66 @@
+{% extends "base.html" %}
+{% block title %}Financial Dashboard{% endblock %}
+{% block content %}
+<header>
+  <h1>Financial Dashboard</h1>
+
+  <div class="symbol-chips" id="symbolChips">
+    {% for sym in symbols %}
+    <button type="button" class="chip" data-symbol="{{ sym }}">{{ sym }}</button>
+    {% endfor %}
+  </div>
+
+  <div class="controls">
+    <label for="symbol-input">Symbol</label>
+    <div class="symbol-field">
+      <input id="symbol-input" list="symbol-list" value="{{ symbols[0] if symbols else 'NVDA' }}" autocomplete="off" spellcheck="false">
+      <button id="symbol-clear" type="button" aria-label="Clear symbol">&times;</button>
+    </div>
+    <datalist id="symbol-list">
+      {% for sym in symbols %}
+      <option value="{{ sym }}">
+      {% endfor %}
+    </datalist>
+
+    <label for="period-select">Period</label>
+    <select id="period-select">
+      <option value="quarterly" selected>Quarterly</option>
+      <option value="annual">Annual</option>
+    </select>
+  </div>
+</header>
+
+<div id="error-banner" class="error-banner" hidden></div>
+<div id="loading" class="loading" hidden>Loading...</div>
+
+<main id="chart-grid" class="chart-grid">
+  <div class="chart-card">
+    <h2>Total Revenue</h2>
+    <canvas id="chart-total_revenue"></canvas>
+  </div>
+  <div class="chart-card">
+    <h2>Gross Profit</h2>
+    <canvas id="chart-gross_profit"></canvas>
+  </div>
+  <div class="chart-card">
+    <h2>Operating Income</h2>
+    <canvas id="chart-operating_income"></canvas>
+  </div>
+  <div class="chart-card">
+    <h2>Net Income</h2>
+    <canvas id="chart-net_income"></canvas>
+  </div>
+  <div class="chart-card">
+    <h2>Free Cash Flow</h2>
+    <canvas id="chart-free_cash_flow"></canvas>
+  </div>
+  <div class="chart-card">
+    <h2>EPS</h2>
+    <canvas id="chart-eps"></canvas>
+  </div>
+</main>
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/dashboard.js') }}"></script>
+{% endblock %}

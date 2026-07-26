@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>{% block title %}Invest Dashboard{% endblock %}</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}" />
+  {% block head %}{% endblock %}
+</head>
+<body>
+  <nav class="tabs">
+    <a href="{{ url_for('price.index') }}" class="tab {{ 'active' if active_tab == 'price' else '' }}">Price vs SMA150</a>
+    <a href="{{ url_for('financials.index') }}" class="tab {{ 'active' if active_tab == 'financials' else '' }}">Financials</a>
+  </nav>
+  <div class="page">
+    {% block content %}{% endblock %}
+  </div>
+  {% block scripts %}{% endblock %}
+</body>
+</html>

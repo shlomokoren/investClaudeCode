@@ -1,0 +1,252 @@
+* {
+  box-sizing: border-box;
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
+  margin: 0;
+  padding: 0;
+  background: #f4f5f7;
+  color: #1a1a1a;
+}
+
+h1 {
+  margin-top: 0;
+}
+
+/* Tab navigation */
+
+nav.tabs {
+  display: flex;
+  gap: 0.5rem;
+  padding: 0.75rem 2rem 0;
+  background: #fff;
+  border-bottom: 1px solid #e2e5ea;
+}
+
+.tab {
+  padding: 0.6rem 1rem;
+  text-decoration: none;
+  color: #475569;
+  font-weight: 600;
+  border-bottom: 2px solid transparent;
+}
+
+.tab.active {
+  color: #2563eb;
+  border-bottom-color: #2563eb;
+}
+
+.page {
+  padding: 1.5rem 2rem;
+}
+
+/* Shared symbol chip list */
+
+.symbol-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  margin-bottom: 1rem;
+}
+
+.chip {
+  padding: 0.35rem 0.75rem;
+  font-size: 0.85rem;
+  border: 1px solid #d0d5dd;
+  border-radius: 999px;
+  background: #fff;
+  color: #333;
+  cursor: pointer;
+}
+
+.chip:hover {
+  background: #eef2ff;
+  border-color: #93a5fd;
+}
+
+.chip.active {
+  background: #2563eb;
+  border-color: #2563eb;
+  color: #fff;
+}
+
+/* Price tab */
+
+.price-controls {
+  background: #fff;
+  padding: 16px;
+  border-radius: 8px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  align-items: end;
+  margin-bottom: 20px;
+}
+
+.price-controls label {
+  display: flex;
+  flex-direction: column;
+  font-size: 13px;
+  color: #555;
+}
+
+.price-controls input,
+.price-controls select {
+  margin-top: 4px;
+  padding: 8px 10px;
+  font-size: 14px;
+  border: 1px solid #d0d5dd;
+  border-radius: 6px;
+  min-width: 100px;
+}
+
+.price-controls input[name="tickers"] {
+  min-width: 320px;
+}
+
+.price-controls button {
+  padding: 9px 18px;
+  font-size: 14px;
+  border: none;
+  border-radius: 6px;
+  background: #2563eb;
+  color: #fff;
+  cursor: pointer;
+}
+
+.price-controls button:hover {
+  background: #1d4ed8;
+}
+
+.price-controls button:disabled {
+  background: #94a3b8;
+  cursor: wait;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(440px, 1fr));
+  gap: 20px;
+}
+
+.card {
+  background: #fff;
+  padding: 16px;
+  border-radius: 8px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+}
+
+.card h2 {
+  margin: 0 0 12px 0;
+  font-size: 18px;
+}
+
+.card .error {
+  color: #b91c1c;
+  font-size: 14px;
+}
+
+.status {
+  color: #475569;
+  font-size: 14px;
+  margin-bottom: 10px;
+}
+
+/* Financials tab */
+
+header h1 {
+  margin: 0 0 1rem;
+  font-size: 1.5rem;
+}
+
+.controls {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+  margin-bottom: 1.5rem;
+}
+
+.controls label {
+  font-weight: 600;
+  margin-left: 0.75rem;
+}
+
+.controls label:first-child {
+  margin-left: 0;
+}
+
+.controls input,
+.controls select {
+  padding: 0.4rem 0.6rem;
+  font-size: 1rem;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+
+.symbol-field {
+  position: relative;
+  display: inline-flex;
+}
+
+.symbol-field input {
+  padding-right: 1.8rem;
+}
+
+.symbol-field button {
+  position: absolute;
+  top: 50%;
+  right: 0.35rem;
+  transform: translateY(-50%);
+  border: none;
+  background: transparent;
+  color: #888;
+  font-size: 1.1rem;
+  line-height: 1;
+  cursor: pointer;
+  padding: 0.1rem 0.3rem;
+}
+
+.symbol-field button:hover {
+  color: #333;
+}
+
+.error-banner {
+  background: #fdecea;
+  color: #611a15;
+  border: 1px solid #f5c6cb;
+  padding: 0.75rem 1rem;
+  border-radius: 4px;
+  margin-bottom: 1rem;
+}
+
+.loading {
+  padding: 0.75rem 1rem;
+  font-style: italic;
+  color: #555;
+}
+
+.chart-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(360px, 1fr));
+  gap: 1.25rem;
+}
+
+.chart-card {
+  background: #fff;
+  border-radius: 8px;
+  padding: 1rem;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.chart-card h2 {
+  margin: 0 0 0.75rem;
+  font-size: 1rem;
+  color: #333;
+}
+
+.chart-card canvas {
+  max-height: 320px;
+}
