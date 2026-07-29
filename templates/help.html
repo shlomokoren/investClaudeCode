@@ -1,0 +1,53 @@
+{% extends "base.html" %}
+{% block title %}Help{% endblock %}
+{% block content %}
+<div class="help-card">
+  <h1>How to use Invest Dashboard</h1>
+  <p class="login-blurb">
+    This app helps you screen a stock's financial health, then decide whether
+    it looks like a good time to buy or sell based on its price trend.
+  </p>
+
+  <div class="help-step">
+    <div class="help-step-number">1</div>
+    <div>
+      <h2>Check the company's financials</h2>
+      <p>
+        Open the <strong>Financials</strong> tab and look up a stock you're
+        curious about. It shows the income statement and cash flow
+        statement — revenue, profit, and free cash flow trends — so you can
+        judge whether the underlying business looks healthy.
+      </p>
+    </div>
+  </div>
+
+  <div class="help-step">
+    <div class="help-step-number">2</div>
+    <div>
+      <h2>If you like the financials, check the price trend</h2>
+      <p>
+        Switch to the <strong>Price Chart (150-day SMA)</strong> tab and add
+        the ticker to your watch list. Each chart plots the stock's price
+        against its 150-day simple moving average (SMA150) — a smoothed line
+        of the average closing price over the last 150 trading days.
+      </p>
+    </div>
+  </div>
+
+  <div class="help-rule">
+    <h2>The simple decision rule</h2>
+    <ul>
+      <li><strong>Price above SMA150</strong> — the stock is in an uptrend; this is treated as a signal to <strong>buy</strong>.</li>
+      <li><strong>Price below SMA150</strong> — the stock is in a downtrend; this is treated as a signal to <strong>sell</strong>.</li>
+    </ul>
+    <p class="help-source">I picked up this price-vs-SMA150 rule from the Micha Stock YouTube podcast.</p>
+  </div>
+
+  <div class="help-disclaimer">
+    <strong>Not financial advice.</strong> This is one simple rule of thumb,
+    not investment advice — I built this app purely to practice software
+    development, not to guide real trading decisions. Do your own research
+    (or talk to a licensed advisor) before buying or selling anything.
+  </div>
+</div>
+{% endblock %}

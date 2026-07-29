@@ -1,6 +1,6 @@
 import os
 
-from flask import Flask
+from flask import Flask, render_template
 
 import auth
 from blueprints.financials import financials_bp
@@ -33,6 +33,11 @@ app.register_blueprint(financials_bp)
 def healthz():
     """Public liveness probe — '/' now redirects to login, so probes use this."""
     return {"status": "ok"}
+
+
+@app.route("/help")
+def help_page():
+    return render_template("help.html", active_tab="help")
 
 
 if __name__ == "__main__":
