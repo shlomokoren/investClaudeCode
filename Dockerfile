@@ -11,7 +11,9 @@ WORKDIR /app
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
-COPY app.py symbols.py config.json ./
+# config.json is kept only as a seed file for init_db.py; the running app reads
+# its configuration from Postgres via DATABASE_URL.
+COPY app.py auth.py symbols.py db.py init_db.py config.json ./
 COPY blueprints ./blueprints
 COPY templates ./templates
 COPY static ./static

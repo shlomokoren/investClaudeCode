@@ -14,6 +14,12 @@ h1 {
   margin-top: 0;
 }
 
+.page-subtitle {
+  margin: -0.4rem 0 1rem;
+  font-size: 14px;
+  color: #667085;
+}
+
 /* Tab navigation */
 
 nav.tabs {
@@ -37,8 +43,183 @@ nav.tabs {
   border-bottom-color: #2563eb;
 }
 
+.nav-user {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  margin-left: auto;
+  padding-bottom: 0.6rem;
+}
+
+.nav-email {
+  font-size: 15px;
+  font-weight: 600;
+  color: #344054;
+  max-width: 240px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.nav-logout {
+  padding: 0.35rem 0.75rem;
+  font-size: 13px;
+  border: 1px solid #d0d5dd;
+  border-radius: 6px;
+  background: #fff;
+  color: #475569;
+  cursor: pointer;
+}
+
+.nav-logout:hover {
+  background: #f1f5f9;
+}
+
 .page {
   padding: 1.5rem 2rem;
+}
+
+/* Login page */
+
+body.login-page {
+  background: radial-gradient(circle at 15% 10%, #dbeafe 0%, transparent 45%),
+    radial-gradient(circle at 85% 90%, #ede9fe 0%, transparent 45%),
+    linear-gradient(160deg, #f7f9fc 0%, #eef1f8 60%, #e9edf7 100%);
+  min-height: 100vh;
+}
+
+body.login-page .page {
+  padding: 0;
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.login-card {
+  width: 100%;
+  max-width: 440px;
+  margin: 1.5rem;
+  padding: 3rem 2.75rem;
+  background: #fff;
+  border-radius: 20px;
+  box-shadow: 0 20px 45px -15px rgba(30, 41, 59, 0.22), 0 2px 8px rgba(30, 41, 59, 0.06);
+  text-align: center;
+}
+
+.login-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 56px;
+  height: 56px;
+  margin-bottom: 1.25rem;
+  border-radius: 16px;
+  background: linear-gradient(135deg, #2563eb, #4f46e5);
+  color: #fff;
+  box-shadow: 0 8px 20px -6px rgba(37, 99, 235, 0.55);
+}
+
+.login-card h1 {
+  font-size: 1.9rem;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  color: #101828;
+  margin-bottom: 0.5rem;
+}
+
+.login-blurb {
+  color: #667085;
+  font-size: 16px;
+  line-height: 1.5;
+  margin-bottom: 2rem;
+}
+
+.login-google {
+  display: inline-flex;
+  width: 100%;
+  align-items: center;
+  justify-content: center;
+  gap: 0.7rem;
+  padding: 0.85rem 1.4rem;
+  border-radius: 10px;
+  background: #2563eb;
+  color: #fff;
+  font-size: 16px;
+  font-weight: 600;
+  text-decoration: none;
+  box-shadow: 0 6px 16px -6px rgba(37, 99, 235, 0.5);
+  transition: background 0.15s ease, transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.login-google:hover {
+  background: #1d4ed8;
+  transform: translateY(-1px);
+  box-shadow: 0 10px 20px -6px rgba(37, 99, 235, 0.55);
+}
+
+.login-google-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: #fff;
+  flex-shrink: 0;
+}
+
+.login-error {
+  margin-bottom: 1.25rem;
+  padding: 0.8rem 1rem;
+  border: 1px solid #fca5a5;
+  border-radius: 8px;
+  background: #fef2f2;
+  color: #b91c1c;
+  font-size: 14px;
+  text-align: left;
+}
+
+.login-divider {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin: 1.75rem 0 1.25rem;
+  color: #98a2b3;
+  font-size: 13px;
+}
+
+.login-divider::before,
+.login-divider::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: #e2e5ea;
+}
+
+.login-dev button {
+  width: 100%;
+  padding: 0.7rem 1rem;
+  font-size: 14px;
+  font-weight: 600;
+  border: 1px solid #d0d5dd;
+  border-radius: 10px;
+  background: #fff;
+  color: #475569;
+  cursor: pointer;
+  transition: background 0.15s ease, border-color 0.15s ease;
+}
+
+.login-dev button:hover {
+  background: #f8fafc;
+  border-color: #98a2b3;
+}
+
+.login-dev-note {
+  display: block;
+  margin-top: 0.6rem;
+  font-size: 12px;
+  color: #98a2b3;
 }
 
 /* Shared symbol chip list */
@@ -69,6 +250,91 @@ nav.tabs {
   background: #2563eb;
   border-color: #2563eb;
   color: #fff;
+}
+
+.empty-list-hint {
+  margin: 0 0 0.9rem;
+  font-size: 14px;
+  color: #667085;
+}
+
+/* Editable chips (price tab): chip toggles the chart, × drops it from the list */
+
+.chip-wrap {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+}
+
+.chip-remove {
+  width: 20px;
+  height: 20px;
+  padding: 0;
+  font-size: 14px;
+  line-height: 1;
+  border: 1px solid transparent;
+  border-radius: 999px;
+  background: transparent;
+  color: #98a2b3;
+  cursor: pointer;
+}
+
+.chip-remove:hover {
+  background: #fee2e2;
+  border-color: #fca5a5;
+  color: #b91c1c;
+}
+
+.symbol-editor {
+  display: flex;
+  align-items: end;
+  gap: 8px;
+  margin-bottom: 1rem;
+}
+
+.symbol-editor label {
+  display: flex;
+  flex-direction: column;
+  font-size: 13px;
+  color: #555;
+}
+
+.symbol-editor input {
+  margin-top: 4px;
+  padding: 7px 10px;
+  font-size: 14px;
+  width: 130px;
+  border: 1px solid #d0d5dd;
+  border-radius: 6px;
+  text-transform: uppercase;
+}
+
+.symbol-editor button {
+  padding: 8px 16px;
+  font-size: 14px;
+  border: none;
+  border-radius: 6px;
+  background: #2563eb;
+  color: #fff;
+  cursor: pointer;
+}
+
+.symbol-editor button:hover {
+  background: #1d4ed8;
+}
+
+.symbol-editor button:disabled {
+  background: #94a3b8;
+  cursor: wait;
+}
+
+.symbol-editor-status {
+  font-size: 13px;
+  color: #667085;
+}
+
+.symbol-editor-status.error {
+  color: #b91c1c;
 }
 
 /* Price tab */

@@ -2,17 +2,42 @@ import os
 
 from flask import Flask
 
+import auth
 from blueprints.financials import financials_bp
 from blueprints.price import price_bp
 
+
+def secret_key() -> str:
+    """Session cookies are signed with this — a fixed fallback would let anyone
+    forge a login, so refuse to start without it."""
+    key = os.environ.get("SECRET_KEY")
+    if not key:
+        raise RuntimeError(
+            "SECRET_KEY is not set. Generate one with "
+            '`python -c "import secrets; print(secrets.token_hex(32))"` '
+            "and put it in .env (see .env.example)."
+        )
+    return key
+
+
 app = Flask(__name__)
+app.debug = os.environ.get("DEBUG", "true").lower() == "true"
+app.secret_key = secret_key()
+
+auth.init_app(app)
 app.register_blueprint(price_bp)
 app.register_blueprint(financials_bp)
+
+
+@app.route("/healthz")
+def healthz():
+    """Public liveness probe — '/' now redirects to login, so probes use this."""
+    return {"status": "ok"}
 
 
 if __name__ == "__main__":
     app.run(
         host=os.environ.get("HOST", "127.0.0.1"),
         port=int(os.environ.get("PORT", "5000")),
-        debug=os.environ.get("DEBUG", "true").lower() == "true",
+        debug=app.debug,
     )

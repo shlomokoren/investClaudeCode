@@ -2,6 +2,7 @@
   "default_stocks": ["AMD", "AMZN", "ARKW", "RDDT", "SOFI", "GOOG", "TSLA",
     "MSFT", "AFRM","ASML","UBER","NVDA","META","AAPL", "ADBE","MU","NOW","ANET"],
   "default_range": "6mo",
+  "owner_email": "shlomo.koren@gmail.com",
   "alerts": {
     "to_list": ["shlomo.koren@gmail.com"],
     "from": "investClaudeCode@mokdosoft.com"

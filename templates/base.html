@@ -8,10 +8,18 @@
   <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}" />
   {% block head %}{% endblock %}
 </head>
-<body>
+<body class="{% block body_class %}{% endblock %}">
   <nav class="tabs">
-    <a href="{{ url_for('price.index') }}" class="tab {{ 'active' if active_tab == 'price' else '' }}">Price vs SMA150</a>
+    {% if current_user %}
+    <a href="{{ url_for('price.index') }}" class="tab {{ 'active' if active_tab == 'price' else '' }}">Price Chart (150-day SMA)</a>
     <a href="{{ url_for('financials.index') }}" class="tab {{ 'active' if active_tab == 'financials' else '' }}">Financials</a>
+    <span class="nav-user">
+      <span class="nav-email" title="Signed in as {{ current_user.email }}">{{ current_user.email }}</span>
+      <form method="post" action="{{ url_for('auth.logout') }}">
+        <button type="submit" class="nav-logout">Sign out</button>
+      </form>
+    </span>
+    {% endif %}
   </nav>
   <div class="page">
     {% block content %}{% endblock %}

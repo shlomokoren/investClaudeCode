@@ -1,14 +1,20 @@
+import re
 from datetime import datetime, timedelta
 
 import pandas as pd
 import yfinance as yf
 from flask import Blueprint, jsonify, render_template, request
 
+import symbols as symbols_config
+from auth import current_user_id
 from symbols import load_config, load_symbols
 
 price_bp = Blueprint("price", __name__)
 
 SMA_WINDOW = 150
+
+# Tickers as Yahoo writes them: letters, digits, dot, dash (BRK-B, RY.TO).
+SYMBOL_RE = re.compile(r"^[A-Z0-9][A-Z0-9.\-]{0,11}$")
 
 RANGE_DAYS = {
     "1mo": 30,
@@ -18,12 +24,26 @@ RANGE_DAYS = {
 }
 
 
-def get_company_name(ticker: str) -> str:
+def get_ticker_info(ticker: str) -> dict:
+    """One info fetch reused for both company name and live price — an extra
+    yfinance call per ticker (on top of yf.download) makes Yahoo's rate
+    limiting more likely, which shows up as charts that silently fail to
+    render."""
     try:
-        info = yf.Ticker(ticker).info or {}
-        return info.get("longName") or info.get("shortName") or ticker
+        return yf.Ticker(ticker).info or {}
     except Exception:
-        return ticker
+        return {}
+
+
+def get_company_name(ticker: str, info: dict) -> str:
+    return info.get("longName") or info.get("shortName") or ticker
+
+
+def get_current_price(info: dict):
+    """Live/last-traded price, so the chart doesn't lag a full day behind
+    (yf.download's daily bars don't include today until after market close)."""
+    price = info.get("currentPrice") or info.get("regularMarketPrice")
+    return None if price is None else round(float(price), 2)
 
 
 def fetch_stock(ticker: str, range_key: str):
@@ -59,9 +79,24 @@ def fetch_stock(ticker: str, range_key: str):
     smas = [None if pd.isna(v) else round(float(v), 2) for v in view["SMA150"]]
     volumes = [None if pd.isna(v) else int(v) for v in view["Volume"]]
 
+    info = get_ticker_info(ticker)
+
+    # Append (or refresh) today's live price so the line doesn't stop at
+    # yesterday's close while the market is open.
+    today = end.strftime("%Y-%m-%d")
+    current_price = get_current_price(info)
+    if current_price is not None:
+        if dates and dates[-1] == today:
+            prices[-1] = current_price
+        else:
+            dates.append(today)
+            prices.append(current_price)
+            smas.append(None)
+            volumes.append(None)
+
     return {
         "ticker": ticker,
-        "name": get_company_name(ticker),
+        "name": get_company_name(ticker, info),
         "dates": dates,
         "prices": prices,
         "sma150": smas,
@@ -71,14 +106,85 @@ def fetch_stock(ticker: str, range_key: str):
 
 @price_bp.route("/")
 def index():
-    config = load_config()
-    symbols = load_symbols()
+    config = load_config(current_user_id())
+    symbols = config["default_stocks"]
+    disabled = set(config.get("disabled_stocks", []))
+    enabled_symbols = [s for s in symbols if s not in disabled]
     return render_template(
         "price.html",
         active_tab="price",
-        default_stocks=",".join(symbols),
+        default_stocks=",".join(enabled_symbols),
         default_range=config["default_range"],
         symbols=symbols,
+    )
+
+
+def _clean_symbol(raw: str):
+    """Normalise a user-supplied ticker, or return (None, error message)."""
+    symbol = (raw or "").strip().upper()
+    if not symbol:
+        return None, "No symbol provided"
+    if not SYMBOL_RE.match(symbol):
+        return None, f"'{symbol}' doesn't look like a ticker symbol"
+    return symbol, None
+
+
+def symbol_exists(symbol: str) -> bool:
+    """Cheap sanity check so typos don't get saved into the list."""
+    try:
+        history = yf.Ticker(symbol).history(period="5d")
+        return not history.empty
+    except Exception:
+        return False
+
+
+@price_bp.route("/api/symbols", methods=["POST"])
+def api_add_symbol():
+    user_id = current_user_id()
+    payload = request.get_json(silent=True) or {}
+    symbol, error = _clean_symbol(payload.get("symbol"))
+    if error:
+        return jsonify({"error": error}), 400
+
+    if symbol in load_symbols(user_id):
+        return jsonify({"error": f"{symbol} is already in your list"}), 409
+
+    if not symbol_exists(symbol):
+        return jsonify({"error": f"No price data found for {symbol}"}), 404
+
+    return jsonify(
+        {"symbols": symbols_config.add_symbol(user_id, symbol), "added": symbol}
+    )
+
+
+@price_bp.route("/api/symbols/<symbol>/status", methods=["POST"])
+def api_set_symbol_status(symbol: str):
+    user_id = current_user_id()
+    symbol, error = _clean_symbol(symbol)
+    if error:
+        return jsonify({"error": error}), 400
+
+    if symbol not in load_symbols(user_id):
+        return jsonify({"error": f"{symbol} is not in your list"}), 404
+
+    payload = request.get_json(silent=True) or {}
+    enabled = bool(payload.get("enabled", True))
+    symbols_config.set_symbol_enabled(user_id, symbol, enabled)
+    return jsonify({"symbol": symbol, "enabled": enabled})
+
+
+@price_bp.route("/api/symbols/<symbol>", methods=["DELETE"])
+def api_remove_symbol(symbol: str):
+    user_id = current_user_id()
+    symbol, error = _clean_symbol(symbol)
+    if error:
+        return jsonify({"error": error}), 400
+
+    if symbol not in load_symbols(user_id):
+        return jsonify({"error": f"{symbol} is not in your list"}), 404
+
+    return jsonify(
+        {"symbols": symbols_config.remove_symbol(user_id, symbol), "removed": symbol}
     )
 
 

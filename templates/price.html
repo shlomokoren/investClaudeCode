@@ -1,13 +1,31 @@
 {% extends "base.html" %}
-{% block title %}Price vs SMA150{% endblock %}
+{% block title %}Price Chart (150-day SMA){% endblock %}
 {% block content %}
-<h1>Stock Price vs SMA150</h1>
+<h1>Stock Price vs 150-Day Moving Average</h1>
+<p class="page-subtitle">Manage your watch list below, then view each ticker's price chart with its 150-day simple moving average.</p>
+
+{% if not symbols %}
+<p class="empty-list-hint" id="emptyHint">Your watch list is empty — add a symbol below to get started.</p>
+{% endif %}
 
 <div class="symbol-chips" id="symbolChips">
   {% for sym in symbols %}
-  <button type="button" class="chip" data-symbol="{{ sym }}">{{ sym }}</button>
+  <span class="chip-wrap" data-symbol="{{ sym }}">
+    <button type="button" class="chip" data-symbol="{{ sym }}">{{ sym }}</button>
+    <button type="button" class="chip-remove" data-remove="{{ sym }}"
+            title="Remove {{ sym }} from the saved list" aria-label="Remove {{ sym }}">&times;</button>
+  </span>
   {% endfor %}
 </div>
+
+<form class="symbol-editor" id="symbolEditor">
+  <label>
+    Add symbol
+    <input type="text" name="symbol" placeholder="e.g. PLTR" maxlength="12" autocomplete="off" />
+  </label>
+  <button type="submit" id="addSymbolBtn">Add</button>
+  <span class="symbol-editor-status" id="symbolStatus"></span>
+</form>
 
 <form class="price-controls" id="controls">
   <label>

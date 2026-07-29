@@ -6,6 +6,7 @@ import pandas as pd
 import yfinance as yf
 from flask import Blueprint, jsonify, render_template, request
 
+from auth import current_user_id
 from symbols import load_symbols
 
 financials_bp = Blueprint("financials", __name__)
@@ -142,7 +143,7 @@ def index():
     return render_template(
         "financials.html",
         active_tab="financials",
-        symbols=load_symbols(),
+        symbols=load_symbols(current_user_id()),
     )
 
 

@@ -6,7 +6,9 @@ namespace: invest-app
 
 resources:
   - namespace.yaml
-  - configmap.yaml
+  # Holds DATABASE_URL. Leave commented out if you create the secret with
+  # `kubectl create secret` instead of committing a value (see secret.yaml).
+  - secret.yaml
   - deployment.yaml
   - service.yaml
   - ingress.yaml
