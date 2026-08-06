@@ -13,6 +13,7 @@
     {% if current_user %}
     <a href="{{ url_for('price.index') }}" class="tab {{ 'active' if active_tab == 'price' else '' }}">Price Chart (150-day SMA)</a>
     <a href="{{ url_for('financials.index') }}" class="tab {{ 'active' if active_tab == 'financials' else '' }}">Financials</a>
+    <a href="{{ url_for('status.index') }}" class="tab {{ 'active' if active_tab == 'status' else '' }}">Portfolio</a>
     <span class="nav-user">
       <a href="{{ url_for('help_page') }}" class="nav-help {{ 'active' if active_tab == 'help' else '' }}" title="Help" aria-label="Help">?</a>
       <span class="nav-email" title="Signed in as {{ current_user.email }}">{{ current_user.email }}</span>

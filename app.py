@@ -5,6 +5,7 @@ from flask import Flask, render_template
 import auth
 from blueprints.financials import financials_bp
 from blueprints.price import price_bp
+from blueprints.status import status_bp
 
 
 def secret_key() -> str:
@@ -27,6 +28,7 @@ app.secret_key = secret_key()
 auth.init_app(app)
 app.register_blueprint(price_bp)
 app.register_blueprint(financials_bp)
+app.register_blueprint(status_bp)
 
 
 @app.route("/healthz")

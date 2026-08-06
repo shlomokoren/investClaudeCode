@@ -72,10 +72,11 @@ def add_symbol(user_id: int, symbol: str) -> list:
 def remove_symbol(user_id: int, symbol: str) -> list:
     """Remove one ticker from a user's list. Returns the updated list.
 
-    Also drops any saved disabled-status for the symbol, so re-adding it
-    later starts enabled rather than resurrecting a stale toggle.
+    Also drops any saved disabled-status and position for the symbol, so
+    re-adding it later starts fresh rather than resurrecting stale state.
     """
     db.remove_user_symbol(user_id, symbol, key=db.DISABLED_SYMBOLS_KEY)
+    db.remove_user_position(user_id, symbol)
     return db.remove_user_symbol(user_id, symbol)
 
 
@@ -91,6 +92,18 @@ def set_symbol_enabled(user_id: int, symbol: str, enabled: bool) -> bool:
     else:
         db.add_user_symbol(user_id, symbol, key=db.DISABLED_SYMBOLS_KEY)
     return enabled
+
+
+def load_positions(user_id: int) -> dict:
+    """Symbol -> held quantity. Symbols with no saved position are absent
+    (treat as 0), not included as explicit zeros."""
+    return db.read_user_config(user_id).get(db.POSITIONS_KEY, {})
+
+
+def set_position(user_id: int, symbol: str, position: float) -> float:
+    """Persist how many shares of a symbol the user holds. Returns it back."""
+    db.set_user_position(user_id, symbol, position)
+    return position
 
 
 def clear_cache() -> None:

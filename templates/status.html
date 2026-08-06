@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+{% block title %}Portfolio{% endblock %}
+{% block content %}
+<h1>Portfolio Status</h1>
+<p class="page-subtitle">Your watch list with live prices and today's change — enter a position to see its value. Click a column header to sort.</p>
+
+<div class="status-toolbar">
+  <div class="status" id="status"></div>
+  <div class="status-total" id="statusTotal"></div>
+</div>
+
+<div class="table-wrap">
+  <table class="status-table" id="statusTable">
+    <thead>
+      <tr>
+        <th data-sort="name">Symbol / Company</th>
+        <th data-sort="previous_close" title="Yesterday's closing price">Previous Close</th>
+        <th data-sort="current_price">Current Price</th>
+        <th data-sort="change_pct">Daily Change %</th>
+        <th data-sort="position">Position</th>
+        <th data-sort="value">Value</th>
+      </tr>
+    </thead>
+    <tbody id="statusBody"></tbody>
+  </table>
+</div>
+
+<div class="card allocation-card">
+  <h2>Portfolio Allocation</h2>
+  <p class="allocation-hint" id="allocationHint" hidden>Enter a position above to see your allocation here.</p>
+  <div class="allocation-chart-wrap">
+    <canvas id="allocationChart"></canvas>
+  </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/status.js') }}"></script>
+{% endblock %}

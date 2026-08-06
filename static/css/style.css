@@ -345,6 +345,134 @@ body.login-page .page {
   line-height: 1.55;
 }
 
+/* Status tab */
+
+.status-toolbar {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 10px;
+}
+
+.status-toolbar .status {
+  margin-bottom: 0;
+}
+
+.status-total {
+  font-size: 15px;
+  color: #344054;
+}
+
+.status-total strong {
+  margin-left: 0.4rem;
+  font-size: 18px;
+  color: #101828;
+}
+
+.allocation-card {
+  margin-top: 20px;
+}
+
+.allocation-card h2 {
+  margin: 0 0 14px;
+  font-size: 16px;
+}
+
+.allocation-hint {
+  margin: 0;
+  color: #667085;
+  font-size: 14px;
+}
+
+.allocation-chart-wrap {
+  max-width: 420px;
+  margin: 0 auto;
+}
+
+.table-wrap {
+  overflow-x: auto;
+  background: #fff;
+  border-radius: 8px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+}
+
+.status-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14px;
+}
+
+.status-table th,
+.status-table td {
+  padding: 10px 14px;
+  text-align: left;
+  border-bottom: 1px solid #eef0f3;
+  white-space: nowrap;
+}
+
+.status-table th {
+  cursor: pointer;
+  user-select: none;
+  color: #475569;
+  font-weight: 700;
+  background: #f8fafc;
+}
+
+.status-table th:hover {
+  color: #2563eb;
+}
+
+.status-table th.sorted-asc::after {
+  content: ' \25B2';
+  font-size: 10px;
+  color: #2563eb;
+}
+
+.status-table th.sorted-desc::after {
+  content: ' \25BC';
+  font-size: 10px;
+  color: #2563eb;
+}
+
+.status-table tbody td:first-child {
+  border-left: 3px solid transparent;
+  transition: background 0.1s ease, border-color 0.1s ease;
+}
+
+.status-table tbody tr:hover td,
+.status-table tbody tr:focus-within td {
+  background: #eef2ff;
+}
+
+.status-table tbody tr:hover td:first-child,
+.status-table tbody tr:focus-within td:first-child {
+  border-left-color: #2563eb;
+}
+
+.status-table td.positive {
+  color: #15803d;
+  font-weight: 600;
+}
+
+.status-table td.negative {
+  color: #b91c1c;
+  font-weight: 600;
+}
+
+.position-input {
+  width: 90px;
+  padding: 5px 8px;
+  border: 1px solid #d0d5dd;
+  border-radius: 6px;
+  background: transparent;
+  font-size: 14px;
+}
+
+.position-input:focus {
+  background: #fff;
+}
+
 /* Shared symbol chip list */
 
 .symbol-chips {

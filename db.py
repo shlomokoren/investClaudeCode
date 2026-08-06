@@ -37,6 +37,7 @@ USER_TABLE = "app_user"
 USER_CONFIG_TABLE = "user_config"
 SYMBOLS_KEY = "default_stocks"
 DISABLED_SYMBOLS_KEY = "disabled_stocks"
+POSITIONS_KEY = "positions"
 
 _SCHEMA_SQL = [
     f"""
@@ -312,3 +313,38 @@ def remove_user_symbol(user_id: int, symbol: str, key: str = SYMBOLS_KEY) -> lis
             {"user_id": user_id, "key": key, "symbol": symbol},
         ).fetchone()
     return row[0] if row else []
+
+
+def set_user_position(user_id: int, symbol: str, position: float) -> dict:
+    """Set one symbol's held quantity in this user's positions object
+    (key=POSITIONS_KEY), merging into whatever's already there. One
+    statement, same race-free reasoning as add_user_symbol."""
+    with get_pool().connection() as conn:
+        row = conn.execute(
+            f"""
+            INSERT INTO {USER_CONFIG_TABLE} (user_id, key, value, updated_at)
+            VALUES (%(user_id)s, %(key)s, jsonb_build_object(%(symbol)s::text, %(position)s::double precision), now())
+            ON CONFLICT (user_id, key) DO UPDATE
+                SET value = {USER_CONFIG_TABLE}.value || jsonb_build_object(%(symbol)s::text, %(position)s::double precision),
+                    updated_at = now()
+            RETURNING value
+            """,
+            {"user_id": user_id, "key": POSITIONS_KEY, "symbol": symbol, "position": position},
+        ).fetchone()
+    return row[0]
+
+
+def remove_user_position(user_id: int, symbol: str) -> dict:
+    """Drop a symbol's saved position, e.g. when it leaves the watch list."""
+    with get_pool().connection() as conn:
+        row = conn.execute(
+            f"""
+            UPDATE {USER_CONFIG_TABLE}
+               SET value = COALESCE(value - %(symbol)s::text, '{{}}'::jsonb),
+                   updated_at = now()
+             WHERE user_id = %(user_id)s AND key = %(key)s
+            RETURNING value
+            """,
+            {"user_id": user_id, "key": POSITIONS_KEY, "symbol": symbol},
+        ).fetchone()
+    return row[0] if row else {}
