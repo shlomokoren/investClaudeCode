@@ -14,7 +14,7 @@
 - `init_db.py` — schema creation and seed data from `config.json`.
 - `blueprints/price.py` — price page + ticker list API.
 - `blueprints/financials.py` — financials page + statement extraction.
-- `templates/` and `static/` — shared page layout plus page-specific assets.
+- `templates/` and `public/` — shared page layout plus page-specific assets. `app.py` sets `static_folder="public", static_url_path=""` so assets are served at the site root (`/css/style.css`), not under `/static/`.
 
 ## Useful behavior notes
 - Every page requires login except `/login`, OAuth callback routes, `/healthz`, and static files.
@@ -45,9 +45,10 @@ docker run -it --rm -p 5000:5000 --env-file .env -d --name invest investclaudeco
 - `HOST`, `PORT`, `DEBUG` — optional runtime config
 
 ## Deployment contract
-- Uses `gunicorn app:app` in Docker/Render/Procfile/k8s manifests.
+- Uses `gunicorn app:app` in Render/Procfile/k8s manifests; the Dockerfile runs `python app.py` directly.
 - Health checks must target `/healthz`.
 - Google callback URI must match deployed host: `/auth/google/callback`.
+- Also deployable to Vercel (`vercel.json`) as a single Python serverless function — zero-config, since Vercel loads the top-level `app` Flask instance directly. On Vercel, use Neon's **pooled** connection string for `DATABASE_URL` (elastic instance count vs. Render's fixed worker count), and expect the in-memory caches in `symbols.py`/`blueprints/financials.py` to be less durable (per-instance, not per-process-forever).
 
 ## Important conventions for AI agents
 - Preserve user-specific config separation: per-user watch lists are stored in `user_config`, global app defaults are in `app_config`.

@@ -21,7 +21,7 @@ def secret_key() -> str:
     return key
 
 
-app = Flask(__name__)
+app = Flask(__name__, static_folder="public", static_url_path="")
 app.debug = os.environ.get("DEBUG", "true").lower() == "true"
 app.secret_key = secret_key()
 
