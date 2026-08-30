@@ -16,7 +16,7 @@ RUN pip install --no-cache-dir -r requirements.txt
 COPY app.py auth.py symbols.py db.py init_db.py config.json ./
 COPY blueprints ./blueprints
 COPY templates ./templates
-COPY static ./static
+COPY public ./public
 
 EXPOSE 5000
 

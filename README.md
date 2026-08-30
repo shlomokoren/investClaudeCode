@@ -25,7 +25,7 @@ templates/
   login.html
   price.html
   financials.html
-static/
+public/
   css/style.css
   js/price.js
   js/dashboard.js
