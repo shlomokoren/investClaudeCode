@@ -72,12 +72,13 @@ def add_symbol(user_id: int, symbol: str) -> list:
 def remove_symbol(user_id: int, symbol: str) -> list:
     """Remove one ticker from a user's list. Returns the updated list.
 
-    Also drops any saved disabled-status, News-tab hidden-status, and position
-    for the symbol, so re-adding it later starts fresh rather than resurrecting
-    stale state.
+    Also drops any saved disabled-status, News/Portfolio hidden-status, and
+    position for the symbol, so re-adding it later starts fresh rather than
+    resurrecting stale state.
     """
     db.remove_user_symbol(user_id, symbol, key=db.DISABLED_SYMBOLS_KEY)
     db.remove_user_symbol(user_id, symbol, key=db.NEWS_HIDDEN_KEY)
+    db.remove_user_symbol(user_id, symbol, key=db.PORTFOLIO_HIDDEN_KEY)
     db.remove_user_position(user_id, symbol)
     return db.remove_user_symbol(user_id, symbol)
 
@@ -109,6 +110,22 @@ def set_news_symbol_hidden(user_id: int, symbol: str, hidden: bool) -> bool:
         db.add_user_symbol(user_id, symbol, key=db.NEWS_HIDDEN_KEY)
     else:
         db.remove_user_symbol(user_id, symbol, key=db.NEWS_HIDDEN_KEY)
+    return hidden
+
+
+def load_portfolio_hidden(user_id: int) -> list:
+    """Watch-list tickers the user has filtered *out* of the Portfolio tab.
+    Stores opt-outs, same as [[load_news_hidden]], so a newly-added symbol
+    shows up on the Portfolio tab by default."""
+    return db.read_user_config(user_id).get(db.PORTFOLIO_HIDDEN_KEY, [])
+
+
+def set_portfolio_symbol_hidden(user_id: int, symbol: str, hidden: bool) -> bool:
+    """Persist a symbol's Portfolio-tab visibility. Returns the new hidden state."""
+    if hidden:
+        db.add_user_symbol(user_id, symbol, key=db.PORTFOLIO_HIDDEN_KEY)
+    else:
+        db.remove_user_symbol(user_id, symbol, key=db.PORTFOLIO_HIDDEN_KEY)
     return hidden
 
 
