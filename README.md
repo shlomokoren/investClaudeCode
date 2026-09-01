@@ -117,9 +117,9 @@ Every target needs `DATABASE_URL`, `SECRET_KEY`, `GOOGLE_CLIENT_ID`, and
 `GOOGLE_CLIENT_SECRET` in its environment, and its own callback URL registered
 with Google. Health checks use `/healthz` because `/` now redirects to login.
 
-- **Render**: [render.yaml](render.yaml) — `gunicorn app:app`, health check on `/healthz`. `SECRET_KEY` is auto-generated (`generateValue: true`); the other three are `sync: false`, so set them in the dashboard.
+- **Vercel**: [vercel.json](vercel.json) — Python runtime, zero-config (Vercel runs the top-level `app` in `app.py` as one serverless function). Set the four values in the project settings and use Neon's *pooled* connection string for `DATABASE_URL`.
 - **Kubernetes / OpenShift**: manifests under [k8s/](k8s/) (namespace, secret, deployment, service, ingress, OpenShift route). All four values come from the `invest-app-db` secret — create it with `kubectl create secret` rather than committing values.
-- **Heroku-style**: [Procfile](Procfile) — same `gunicorn app:app` command; set all four as config vars.
+- **Heroku-style**: [Procfile](Procfile) — `gunicorn app:app`; set all four as config vars.
 
 ## Data source
 

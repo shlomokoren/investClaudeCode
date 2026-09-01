@@ -54,10 +54,10 @@ docker run -it --rm -p 5000:5000 --env-file .env -d --name invest investclaudeco
 - Scheme: MAJOR = deploy needs manual work, MINOR = new feature, PATCH = fixes.
 
 ## Deployment contract
-- Uses `gunicorn app:app` in Render/Procfile/k8s manifests; the Dockerfile runs `python app.py` directly.
+- Uses `gunicorn app:app` in the Procfile and k8s manifests; the Dockerfile runs `python app.py` directly.
 - Health checks must target `/healthz`.
 - Google callback URI must match deployed host: `/auth/google/callback`.
-- Also deployable to Vercel (`vercel.json`) as a single Python serverless function — zero-config, since Vercel loads the top-level `app` Flask instance directly. On Vercel, use Neon's **pooled** connection string for `DATABASE_URL` (elastic instance count vs. Render's fixed worker count), and expect the in-memory caches in `symbols.py`/`blueprints/financials.py` to be less durable (per-instance, not per-process-forever).
+- Also deployable to Vercel (`vercel.json`) as a single Python serverless function — zero-config, since Vercel loads the top-level `app` Flask instance directly. On Vercel, use Neon's **pooled** connection string for `DATABASE_URL` (elastic instance count vs. a fixed worker pool), and expect the in-memory caches in `symbols.py`/`blueprints/financials.py` to be less durable (per-instance, not per-process-forever).
 
 ## Important conventions for AI agents
 - Preserve user-specific config separation: per-user watch lists are stored in `user_config`, global app defaults are in `app_config`.
