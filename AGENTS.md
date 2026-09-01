@@ -14,6 +14,8 @@
 - `init_db.py` — schema creation and seed data from `config.json`.
 - `blueprints/price.py` — price page + ticker list API.
 - `blueprints/financials.py` — financials page + statement extraction.
+- `blueprints/status.py` — Portfolio page: watch list with live prices, positions, allocation chart.
+- `blueprints/events.py` — Events page: per-symbol earnings + dividend dates from yfinance, cached per-process for 6h.
 - `templates/` and `public/` — shared page layout plus page-specific assets. `app.py` sets `static_folder="public", static_url_path=""` so assets are served at the site root (`/css/style.css`), not under `/static/`.
 
 ## Useful behavior notes

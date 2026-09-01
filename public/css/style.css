@@ -473,6 +473,30 @@ body.login-page .page {
   background: #fff;
 }
 
+/* Events tab */
+
+.est-flag {
+  display: inline-block;
+  padding: 1px 5px;
+  border-radius: 4px;
+  background: #fef3c7;
+  color: #92400e;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+}
+
+.status-table td.soon {
+  color: #b45309;
+  font-weight: 700;
+}
+
+.status-table tbody tr.row-error td {
+  color: #98a2b3;
+  font-style: italic;
+}
+
 /* Shared symbol chip list */
 
 .symbol-chips {
