@@ -72,10 +72,12 @@ def add_symbol(user_id: int, symbol: str) -> list:
 def remove_symbol(user_id: int, symbol: str) -> list:
     """Remove one ticker from a user's list. Returns the updated list.
 
-    Also drops any saved disabled-status and position for the symbol, so
-    re-adding it later starts fresh rather than resurrecting stale state.
+    Also drops any saved disabled-status, News-tab hidden-status, and position
+    for the symbol, so re-adding it later starts fresh rather than resurrecting
+    stale state.
     """
     db.remove_user_symbol(user_id, symbol, key=db.DISABLED_SYMBOLS_KEY)
+    db.remove_user_symbol(user_id, symbol, key=db.NEWS_HIDDEN_KEY)
     db.remove_user_position(user_id, symbol)
     return db.remove_user_symbol(user_id, symbol)
 
@@ -92,6 +94,22 @@ def set_symbol_enabled(user_id: int, symbol: str, enabled: bool) -> bool:
     else:
         db.add_user_symbol(user_id, symbol, key=db.DISABLED_SYMBOLS_KEY)
     return enabled
+
+
+def load_news_hidden(user_id: int) -> list:
+    """Watch-list tickers the user has toggled *off* on the News tab. Storing
+    the opt-outs (not the selection) means a newly-added symbol shows up in
+    the news feed by default, same as disabled_stocks does for charts."""
+    return db.read_user_config(user_id).get(db.NEWS_HIDDEN_KEY, [])
+
+
+def set_news_symbol_hidden(user_id: int, symbol: str, hidden: bool) -> bool:
+    """Persist a symbol's News-tab visibility. Returns the new hidden state."""
+    if hidden:
+        db.add_user_symbol(user_id, symbol, key=db.NEWS_HIDDEN_KEY)
+    else:
+        db.remove_user_symbol(user_id, symbol, key=db.NEWS_HIDDEN_KEY)
+    return hidden
 
 
 def load_positions(user_id: int) -> dict:

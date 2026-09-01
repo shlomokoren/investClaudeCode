@@ -5,6 +5,7 @@ from flask import Flask, render_template
 import auth
 from blueprints.events import events_bp
 from blueprints.financials import financials_bp
+from blueprints.news import news_bp
 from blueprints.price import price_bp
 from blueprints.status import status_bp
 
@@ -31,6 +32,7 @@ app.register_blueprint(price_bp)
 app.register_blueprint(financials_bp)
 app.register_blueprint(status_bp)
 app.register_blueprint(events_bp)
+app.register_blueprint(news_bp)
 
 
 @app.route("/healthz")

@@ -15,6 +15,7 @@
     <a href="{{ url_for('financials.index') }}" class="tab {{ 'active' if active_tab == 'financials' else '' }}">Financials</a>
     <a href="{{ url_for('status.index') }}" class="tab {{ 'active' if active_tab == 'status' else '' }}">Portfolio</a>
     <a href="{{ url_for('events.index') }}" class="tab {{ 'active' if active_tab == 'events' else '' }}">Events</a>
+    <a href="{{ url_for('news.index') }}" class="tab {{ 'active' if active_tab == 'news' else '' }}">News</a>
     <span class="nav-user">
       <a href="{{ url_for('help_page') }}" class="nav-help {{ 'active' if active_tab == 'help' else '' }}" title="Help" aria-label="Help">?</a>
       <span class="nav-email" title="Signed in as {{ current_user.email }}">{{ current_user.email }}</span>

@@ -497,6 +497,86 @@ body.login-page .page {
   font-style: italic;
 }
 
+/* News tab */
+
+.news-feed {
+  max-height: 70vh;
+  overflow-y: auto;
+  background: #fff;
+  border-radius: 8px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+  padding: 4px 16px;
+}
+
+.news-item {
+  display: flex;
+  gap: 14px;
+  padding: 16px 0;
+  border-bottom: 1px solid #eef0f3;
+}
+
+.news-item:last-child {
+  border-bottom: none;
+}
+
+.news-thumb {
+  width: 120px;
+  height: 80px;
+  object-fit: cover;
+  border-radius: 6px;
+  flex-shrink: 0;
+  background: #f1f5f9;
+}
+
+.news-body {
+  min-width: 0;
+}
+
+.news-title {
+  margin: 0 0 6px;
+  font-size: 15px;
+  line-height: 1.4;
+}
+
+.news-title a {
+  color: #1d4ed8;
+  text-decoration: none;
+}
+
+.news-title a:hover {
+  text-decoration: underline;
+}
+
+.news-meta {
+  font-size: 12px;
+  color: #667085;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 6px;
+}
+
+.news-tag {
+  padding: 1px 6px;
+  border-radius: 4px;
+  background: #eef2ff;
+  color: #3730a3;
+  font-weight: 700;
+  font-size: 11px;
+}
+
+.news-summary {
+  margin: 0;
+  font-size: 13px;
+  line-height: 1.5;
+  color: #344054;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
 /* Shared symbol chip list */
 
 .symbol-chips {

@@ -16,6 +16,7 @@
 - `blueprints/financials.py` — financials page + statement extraction.
 - `blueprints/status.py` — Portfolio page: watch list with live prices, positions, allocation chart.
 - `blueprints/events.py` — Events page: per-symbol earnings + dividend dates from yfinance, cached per-process for 6h.
+- `blueprints/news.py` — News page: recent Yahoo Finance headlines per symbol via `yfinance.Ticker.news`, multi-select chip filter (persisted per-user as `news_hidden`) + `days` window, cached per-symbol for 20min.
 - `templates/` and `public/` — shared page layout plus page-specific assets. `app.py` sets `static_folder="public", static_url_path=""` so assets are served at the site root (`/css/style.css`), not under `/static/`.
 
 ## Useful behavior notes

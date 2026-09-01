@@ -37,6 +37,7 @@ USER_TABLE = "app_user"
 USER_CONFIG_TABLE = "user_config"
 SYMBOLS_KEY = "default_stocks"
 DISABLED_SYMBOLS_KEY = "disabled_stocks"
+NEWS_HIDDEN_KEY = "news_hidden"
 POSITIONS_KEY = "positions"
 
 _SCHEMA_SQL = [
@@ -269,8 +270,9 @@ def write_user_config(user_id: int, key: str, value) -> None:
 
 def add_user_symbol(user_id: int, symbol: str, key: str = SYMBOLS_KEY) -> list:
     """Append a ticker to one of this user's jsonb-array config lists if
-    absent. Returns the new list. Same helper backs both the watch list
-    (key=SYMBOLS_KEY) and the disabled-symbols list (key=DISABLED_SYMBOLS_KEY).
+    absent. Returns the new list. The same helper backs the watch list
+    (key=SYMBOLS_KEY), the disabled-symbols list (key=DISABLED_SYMBOLS_KEY),
+    and the News-tab hidden list (key=NEWS_HIDDEN_KEY).
 
     One statement, so two concurrent edits can't clobber each other the way a
     read-modify-write from Python would.
