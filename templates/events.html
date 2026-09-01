@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+{% block title %}Events{% endblock %}
+{% block content %}
+<h1>Earnings &amp; Dividend Events</h1>
+<p class="page-subtitle">
+  Upcoming earnings and dividend dates for your watch list. Future earnings dates
+  marked <span class="est-flag">est.</span> are estimated windows, not confirmed
+  days. "Last Dividend" is the most recent amount paid per share — the next
+  dividend's amount usually isn't published until it's declared. Click a column
+  header to sort; the default order is soonest upcoming event first.
+</p>
+
+<div class="status-toolbar">
+  <div class="status" id="status"></div>
+</div>
+
+<div class="table-wrap">
+  <table class="status-table" id="eventsTable">
+    <thead>
+      <tr>
+        <th data-sort="name">Symbol / Company</th>
+        <th data-sort="earnings_date">Next Earnings</th>
+        <th data-sort="days_to_earnings" title="Calendar days until the next earnings date">Days to Earnings</th>
+        <th data-sort="ex_dividend_date" title="Buy before this date to receive the next dividend">Ex-Dividend Date</th>
+        <th data-sort="pay_date">Dividend Pay Date</th>
+        <th data-sort="last_dividend" title="Most recent dividend paid, per share">Last Dividend</th>
+        <th data-sort="annual_rate" title="Annualized dividend per share">Annual Rate</th>
+        <th data-sort="dividend_yield">Yield %</th>
+        <th data-sort="frequency">Frequency</th>
+      </tr>
+    </thead>
+    <tbody id="eventsBody"></tbody>
+  </table>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/events.js') }}"></script>
+{% endblock %}
