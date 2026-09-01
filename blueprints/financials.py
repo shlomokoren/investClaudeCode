@@ -7,7 +7,7 @@ import yfinance as yf
 from flask import Blueprint, jsonify, render_template, request
 
 from auth import current_user_id
-from symbols import load_symbols
+from symbols import load_financials_symbol, load_symbols, set_financials_symbol
 
 financials_bp = Blueprint("financials", __name__)
 
@@ -140,10 +140,17 @@ def _fetch_financials(symbol, period):
 
 @financials_bp.route("/financials")
 def index():
+    user_id = current_user_id()
+    symbols = load_symbols(user_id)
+    # Reopen on whatever ticker was last viewed, so a refresh doesn't reset it.
+    initial_symbol = load_financials_symbol(user_id) or (
+        symbols[0] if symbols else "NVDA"
+    )
     return render_template(
         "financials.html",
         active_tab="financials",
-        symbols=load_symbols(current_user_id()),
+        symbols=symbols,
+        initial_symbol=initial_symbol,
     )
 
 
@@ -161,6 +168,7 @@ def api_financials():
     cache_key = (symbol, period)
     cached = _cache.get(cache_key)
     if cached and time.time() - cached[0] < CACHE_TTL_SECONDS:
+        _remember_symbol(symbol)
         return jsonify(cached[1])
 
     try:
@@ -173,4 +181,18 @@ def api_financials():
         return jsonify({"error": f"No income statement data found for '{symbol}'"}), 404
 
     _cache[cache_key] = (time.time(), data)
+    _remember_symbol(symbol)
     return jsonify(data)
+
+
+def _remember_symbol(symbol: str) -> None:
+    """Persist the last successfully-loaded ticker for this user so the
+    Financials tab reopens on it. Best-effort — a DB hiccup here must not
+    fail the data response."""
+    user_id = current_user_id()
+    if not user_id:
+        return
+    try:
+        set_financials_symbol(user_id, symbol)
+    except Exception:
+        logger.exception("Failed to remember financials symbol %s", symbol)

@@ -13,7 +13,7 @@
   <div class="controls">
     <label for="symbol-input">Symbol</label>
     <div class="symbol-field">
-      <input id="symbol-input" list="symbol-list" value="{{ symbols[0] if symbols else 'NVDA' }}" autocomplete="off" spellcheck="false">
+      <input id="symbol-input" list="symbol-list" value="{{ initial_symbol }}" autocomplete="off" spellcheck="false">
       <button id="symbol-clear" type="button" aria-label="Clear symbol">&times;</button>
     </div>
     <datalist id="symbol-list">

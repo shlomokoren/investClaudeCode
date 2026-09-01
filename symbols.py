@@ -145,6 +145,18 @@ def set_events_symbol_hidden(user_id: int, symbol: str, hidden: bool) -> bool:
     return hidden
 
 
+def load_financials_symbol(user_id: int):
+    """The ticker the user last looked at on the Financials tab, or None.
+    Unlike the watch list, this can be any symbol the user typed in."""
+    value = db.read_user_config(user_id).get(db.FINANCIALS_SYMBOL_KEY)
+    return value or None
+
+
+def set_financials_symbol(user_id: int, symbol: str) -> None:
+    """Remember the ticker the user is viewing on the Financials tab."""
+    db.write_user_config(user_id, db.FINANCIALS_SYMBOL_KEY, symbol)
+
+
 def load_positions(user_id: int) -> dict:
     """Symbol -> held quantity. Symbols with no saved position are absent
     (treat as 0), not included as explicit zeros."""

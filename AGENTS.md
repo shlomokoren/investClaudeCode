@@ -13,7 +13,7 @@
 - `symbols.py` — global config caching + per-user watch list logic.
 - `init_db.py` — schema creation and seed data from `config.json`.
 - `blueprints/price.py` — price page + ticker list API.
-- `blueprints/financials.py` — financials page + statement extraction.
+- `blueprints/financials.py` — financials page + statement extraction; remembers the last-viewed ticker per-user (`financials_symbol`) so a refresh keeps it.
 - `blueprints/status.py` — Portfolio page: watch list with live prices, positions, allocation chart; multi-select symbol filter persisted per-user as `portfolio_hidden`.
 - `blueprints/events.py` — Events page: per-symbol earnings + dividend dates from yfinance, cached per-process for 6h; multi-select symbol filter persisted per-user as `events_hidden`.
 - `blueprints/news.py` — News page: recent Yahoo Finance headlines per symbol via `yfinance.Ticker.news`, multi-select chip filter (persisted per-user as `news_hidden`) + `days` window, cached per-symbol for 20min.

@@ -40,6 +40,7 @@ DISABLED_SYMBOLS_KEY = "disabled_stocks"
 NEWS_HIDDEN_KEY = "news_hidden"
 PORTFOLIO_HIDDEN_KEY = "portfolio_hidden"
 EVENTS_HIDDEN_KEY = "events_hidden"
+FINANCIALS_SYMBOL_KEY = "financials_symbol"
 POSITIONS_KEY = "positions"
 
 _SCHEMA_SQL = [
