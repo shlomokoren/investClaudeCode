@@ -1,10 +1,13 @@
 name: Release
 
 # When work lands on main (i.e. a dev -> main merge), publish a GitHub
-# Release for the version declared in app.py. If a release for that
-# version already exists nothing happens, so merging to main without
-# bumping __version__ is a safe no-op. Bump __version__ in the same
-# change you merge and the release shows up on the repo page by itself.
+# Release for the version declared in app.py, using the matching section
+# of CHANGELOG.md as the release notes. If a release for that version
+# already exists nothing happens, so merging to main without bumping
+# __version__ is a safe no-op.
+#
+# To cut a release: move the CHANGELOG "[Unreleased]" bullets under a new
+# "## [X.Y.Z] - DATE" heading, set __version__ to match, and merge to main.
 
 on:
   push:
@@ -33,6 +36,24 @@ jobs:
           echo "version=$version" >> "$GITHUB_OUTPUT"
           echo "app.py version: $version"
 
+      - name: Build release notes from CHANGELOG.md
+        id: notes
+        run: |
+          version="${{ steps.v.outputs.version }}"
+          # Print the lines between "## [version]" and the next "## [" heading.
+          awk -v prefix="## [$version]" '
+            index($0, prefix) == 1 { flag = 1; next }
+            flag && /^## \[/        { exit }
+            flag                    { print }
+          ' CHANGELOG.md | sed '/./,$!d' > notes.md
+          if [ -s notes.md ]; then
+            echo "have_notes=true" >> "$GITHUB_OUTPUT"
+            echo "Using CHANGELOG.md section for v$version:"; cat notes.md
+          else
+            echo "have_notes=false" >> "$GITHUB_OUTPUT"
+            echo "No CHANGELOG.md section for v$version — will auto-generate notes."
+          fi
+
       - name: Release v${{ steps.v.outputs.version }} if it is new
         env:
           GH_TOKEN: ${{ github.token }}
@@ -43,8 +64,10 @@ jobs:
             exit 0
           fi
           echo "Creating release $tag"
-          gh release create "$tag" \
-            --target "${{ github.sha }}" \
-            --title "$tag" \
-            --generate-notes \
-            --latest
+          if [ "${{ steps.notes.outputs.have_notes }}" = "true" ]; then
+            gh release create "$tag" --target "${{ github.sha }}" \
+              --title "$tag" --notes-file notes.md --latest
+          else
+            gh release create "$tag" --target "${{ github.sha }}" \
+              --title "$tag" --generate-notes --latest
+          fi
