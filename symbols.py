@@ -72,10 +72,14 @@ def add_symbol(user_id: int, symbol: str) -> list:
 def remove_symbol(user_id: int, symbol: str) -> list:
     """Remove one ticker from a user's list. Returns the updated list.
 
-    Also drops any saved disabled-status and position for the symbol, so
-    re-adding it later starts fresh rather than resurrecting stale state.
+    Also drops any saved disabled-status, News/Portfolio hidden-status, and
+    position for the symbol, so re-adding it later starts fresh rather than
+    resurrecting stale state.
     """
     db.remove_user_symbol(user_id, symbol, key=db.DISABLED_SYMBOLS_KEY)
+    db.remove_user_symbol(user_id, symbol, key=db.NEWS_HIDDEN_KEY)
+    db.remove_user_symbol(user_id, symbol, key=db.PORTFOLIO_HIDDEN_KEY)
+    db.remove_user_symbol(user_id, symbol, key=db.EVENTS_HIDDEN_KEY)
     db.remove_user_position(user_id, symbol)
     return db.remove_user_symbol(user_id, symbol)
 
@@ -92,6 +96,65 @@ def set_symbol_enabled(user_id: int, symbol: str, enabled: bool) -> bool:
     else:
         db.add_user_symbol(user_id, symbol, key=db.DISABLED_SYMBOLS_KEY)
     return enabled
+
+
+def load_news_hidden(user_id: int) -> list:
+    """Watch-list tickers the user has toggled *off* on the News tab. Storing
+    the opt-outs (not the selection) means a newly-added symbol shows up in
+    the news feed by default, same as disabled_stocks does for charts."""
+    return db.read_user_config(user_id).get(db.NEWS_HIDDEN_KEY, [])
+
+
+def set_news_symbol_hidden(user_id: int, symbol: str, hidden: bool) -> bool:
+    """Persist a symbol's News-tab visibility. Returns the new hidden state."""
+    if hidden:
+        db.add_user_symbol(user_id, symbol, key=db.NEWS_HIDDEN_KEY)
+    else:
+        db.remove_user_symbol(user_id, symbol, key=db.NEWS_HIDDEN_KEY)
+    return hidden
+
+
+def load_portfolio_hidden(user_id: int) -> list:
+    """Watch-list tickers the user has filtered *out* of the Portfolio tab.
+    Stores opt-outs, same as [[load_news_hidden]], so a newly-added symbol
+    shows up on the Portfolio tab by default."""
+    return db.read_user_config(user_id).get(db.PORTFOLIO_HIDDEN_KEY, [])
+
+
+def set_portfolio_symbol_hidden(user_id: int, symbol: str, hidden: bool) -> bool:
+    """Persist a symbol's Portfolio-tab visibility. Returns the new hidden state."""
+    if hidden:
+        db.add_user_symbol(user_id, symbol, key=db.PORTFOLIO_HIDDEN_KEY)
+    else:
+        db.remove_user_symbol(user_id, symbol, key=db.PORTFOLIO_HIDDEN_KEY)
+    return hidden
+
+
+def load_events_hidden(user_id: int) -> list:
+    """Watch-list tickers the user has filtered *out* of the Events tab.
+    Stores opt-outs, same as [[load_news_hidden]] / [[load_portfolio_hidden]]."""
+    return db.read_user_config(user_id).get(db.EVENTS_HIDDEN_KEY, [])
+
+
+def set_events_symbol_hidden(user_id: int, symbol: str, hidden: bool) -> bool:
+    """Persist a symbol's Events-tab visibility. Returns the new hidden state."""
+    if hidden:
+        db.add_user_symbol(user_id, symbol, key=db.EVENTS_HIDDEN_KEY)
+    else:
+        db.remove_user_symbol(user_id, symbol, key=db.EVENTS_HIDDEN_KEY)
+    return hidden
+
+
+def load_financials_symbol(user_id: int):
+    """The ticker the user last looked at on the Financials tab, or None.
+    Unlike the watch list, this can be any symbol the user typed in."""
+    value = db.read_user_config(user_id).get(db.FINANCIALS_SYMBOL_KEY)
+    return value or None
+
+
+def set_financials_symbol(user_id: int, symbol: str) -> None:
+    """Remember the ticker the user is viewing on the Financials tab."""
+    db.write_user_config(user_id, db.FINANCIALS_SYMBOL_KEY, symbol)
 
 
 def load_positions(user_id: int) -> dict:

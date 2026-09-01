@@ -7,8 +7,19 @@
   marked <span class="est-flag">est.</span> are estimated windows, not confirmed
   days. "Last Dividend" is the most recent amount paid per share — the next
   dividend's amount usually isn't published until it's declared. Click a column
-  header to sort; the default order is soonest upcoming event first.
+  header to sort; the default order is soonest upcoming event first. Toggle
+  symbols below to filter the table.
 </p>
+
+{% if not symbols %}
+<p class="empty-list-hint">Your watch list is empty — add symbols from the Price Chart tab.</p>
+{% endif %}
+
+<div class="symbol-chips" id="symbolChips">
+  {% for sym in symbols %}
+  <button type="button" class="chip {{ '' if sym in hidden else 'active' }}" data-symbol="{{ sym }}">{{ sym }}</button>
+  {% endfor %}
+</div>
 
 <div class="status-toolbar">
   <div class="status" id="status"></div>

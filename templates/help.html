@@ -4,50 +4,75 @@
 <div class="help-card">
   <h1>How to use Invest Dashboard</h1>
   <p class="login-blurb">
-    This app helps you screen a stock's financial health, then decide whether
-    it looks like a good time to buy or sell based on its price trend.
+    Invest Dashboard helps you research a stock — is the business healthy, is
+    the price trending up or down — and keep an eye on the ones you follow.
+    Sign in with Google and you get your own private watch list, shared across
+    every tab. Add or remove tickers on the <strong>Price Chart</strong> tab;
+    the change applies everywhere.
   </p>
 
-  <div class="help-step">
-    <div class="help-step-number">1</div>
-    <div>
-      <h2>Check the company's financials</h2>
-      <p>
-        Open the <strong>Financials</strong> tab and look up a stock you're
-        curious about. It shows the income statement and cash flow
-        statement — revenue, profit, and free cash flow trends — so you can
-        judge whether the underlying business looks healthy.
-      </p>
-    </div>
+  <h2 class="help-section-title">The tabs</h2>
+
+  <div class="help-tab help-tab--price">
+    <h3>Price Chart (150-day SMA)</h3>
+    <p><strong>What it is:</strong> each stock's price plotted against its 150-day moving average (SMA150), with a volume bar.</p>
+    <p><strong>What it's for:</strong> seeing whether a stock is trending up or down right now.</p>
+    <p><strong>How to use it:</strong> add tickers with <em>Add symbol</em>, click a chip to show or hide its chart, and pick a date range. Price above the SMA150 line is an uptrend; below it is a downtrend.</p>
   </div>
 
-  <div class="help-step">
-    <div class="help-step-number">2</div>
-    <div>
-      <h2>If you like the financials, check the price trend</h2>
-      <p>
-        Switch to the <strong>Price Chart (150-day SMA)</strong> tab and add
-        the ticker to your watch list. Each chart plots the stock's price
-        against its 150-day simple moving average (SMA150) — a smoothed line
-        of the average closing price over the last 150 trading days.
-      </p>
-    </div>
+  <div class="help-tab help-tab--financials">
+    <h3>Financials</h3>
+    <p><strong>What it is:</strong> revenue, profit, free cash flow and EPS for one company, charted quarter by quarter or year by year.</p>
+    <p><strong>What it's for:</strong> checking the business is healthy before you worry about the share price.</p>
+    <p><strong>How to use it:</strong> type a ticker or click a chip, then switch between Quarterly and Annual. Look for steady growth rather than one good quarter.</p>
   </div>
+
+  <div class="help-tab help-tab--status">
+    <h3>Portfolio</h3>
+    <p><strong>What it is:</strong> your watch list with live price, today's change, the value of any shares you hold, and an allocation pie chart.</p>
+    <p><strong>What it's for:</strong> seeing what you own and how it's doing today.</p>
+    <p><strong>How to use it:</strong> enter a share count in the <em>Position</em> column — the totals and pie update instantly. Use the chips to filter and click a column header to sort.</p>
+  </div>
+
+  <div class="help-tab help-tab--events">
+    <h3>Events</h3>
+    <p><strong>What it is:</strong> the next earnings date and the dividend schedule (ex-date, pay date, amount, yield) for each watch-list stock.</p>
+    <p><strong>What it's for:</strong> knowing when a holding reports results or pays a dividend.</p>
+    <p><strong>How to use it:</strong> it opens sorted by soonest event; click any header to re-sort, use the chips to filter. An <span class="est-flag">est.</span> tag means the earnings date is still an estimate.</p>
+  </div>
+
+  <div class="help-tab help-tab--news">
+    <h3>News</h3>
+    <p><strong>What it is:</strong> recent Yahoo Finance headlines for the symbols you pick.</p>
+    <p><strong>What it's for:</strong> a quick catch-up on what's moving your stocks.</p>
+    <p><strong>How to use it:</strong> toggle symbols with the chips, choose how far back to look (2 days by default), and scroll the feed. Your selection is remembered next time.</p>
+  </div>
+
+  <h2 class="help-section-title">A suggested workflow</h2>
+  <ol class="help-workflow">
+    <li>Check a company on <strong>Financials</strong> — is it growing?</li>
+    <li>If it looks healthy, open the <strong>Price Chart</strong> — is it above or below its SMA150?</li>
+    <li>Add it to your list and follow it from <strong>Portfolio</strong>, <strong>Events</strong>, and <strong>News</strong>.</li>
+  </ol>
 
   <div class="help-rule">
     <h2>The simple decision rule</h2>
     <ul>
-      <li><strong>Price above SMA150</strong> — the stock is in an uptrend; this is treated as a signal to <strong>buy</strong>.</li>
-      <li><strong>Price below SMA150</strong> — the stock is in a downtrend; this is treated as a signal to <strong>sell</strong>.</li>
+      <li><strong>Price above SMA150</strong> — uptrend; treated as a <strong>buy</strong> signal.</li>
+      <li><strong>Price below SMA150</strong> — downtrend; treated as a <strong>sell</strong> signal.</li>
     </ul>
-    <p class="help-source">I picked up this price-vs-SMA150 rule from the Micha Stock YouTube podcast.</p>
+    <p class="help-source">This price-vs-SMA150 rule comes from the Micha Stock YouTube podcast.</p>
   </div>
 
   <div class="help-disclaimer">
-    <strong>Not financial advice.</strong> This is one simple rule of thumb,
-    not investment advice — I built this app purely to practice software
-    development, not to guide real trading decisions. Do your own research
-    (or talk to a licensed advisor) before buying or selling anything.
+    <strong>Not financial advice.</strong> This is one rule of thumb, not
+    investment advice — the app was built to practise software development, not
+    to guide real trades. Do your own research (or talk to a licensed advisor)
+    before buying or selling anything.
   </div>
+
+  {% if version %}
+  <p class="help-version">Invest Dashboard v{{ version }}</p>
+  {% endif %}
 </div>
 {% endblock %}

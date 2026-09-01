@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+{% block title %}News{% endblock %}
+{% block content %}
+<h1>Watch List News</h1>
+<p class="page-subtitle">
+  Recent headlines for the symbols you select, from Yahoo Finance. Toggle
+  symbols below and pick how far back to look. Yahoo returns a limited number
+  of stories per ticker, so a short window on a quietly-covered symbol may
+  show nothing.
+</p>
+
+{% if not symbols %}
+<p class="empty-list-hint">Your watch list is empty — add symbols from the Price Chart tab.</p>
+{% endif %}
+
+<div class="symbol-chips" id="symbolChips">
+  {% for sym in symbols %}
+  <button type="button" class="chip {{ '' if sym in hidden else 'active' }}" data-symbol="{{ sym }}">{{ sym }}</button>
+  {% endfor %}
+</div>
+
+<form class="price-controls" id="newsControls">
+  <label>
+    Look back
+    <select name="days">
+      <option value="1">1 day</option>
+      <option value="2">2 days</option>
+      <option value="3">3 days</option>
+      <option value="7">7 days</option>
+      <option value="14">14 days</option>
+    </select>
+  </label>
+  <button type="submit" id="refreshBtn">Refresh</button>
+</form>
+
+<div class="status" id="status"></div>
+<div class="news-feed" id="newsFeed"></div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+  window.DEFAULT_DAYS = "{{ default_days }}";
+</script>
+<script src="{{ url_for('static', filename='js/news.js') }}"></script>
+{% endblock %}

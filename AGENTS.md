@@ -13,9 +13,10 @@
 - `symbols.py` — global config caching + per-user watch list logic.
 - `init_db.py` — schema creation and seed data from `config.json`.
 - `blueprints/price.py` — price page + ticker list API.
-- `blueprints/financials.py` — financials page + statement extraction.
-- `blueprints/status.py` — Portfolio page: watch list with live prices, positions, allocation chart.
-- `blueprints/events.py` — Events page: per-symbol earnings + dividend dates from yfinance, cached per-process for 6h.
+- `blueprints/financials.py` — financials page + statement extraction; remembers the last-viewed ticker per-user (`financials_symbol`) so a refresh keeps it.
+- `blueprints/status.py` — Portfolio page: watch list with live prices, positions, allocation chart; multi-select symbol filter persisted per-user as `portfolio_hidden`.
+- `blueprints/events.py` — Events page: per-symbol earnings + dividend dates from yfinance, cached per-process for 6h; multi-select symbol filter persisted per-user as `events_hidden`.
+- `blueprints/news.py` — News page: recent Yahoo Finance headlines per symbol via `yfinance.Ticker.news`, multi-select chip filter (persisted per-user as `news_hidden`) + `days` window, cached per-symbol for 20min.
 - `templates/` and `public/` — shared page layout plus page-specific assets. `app.py` sets `static_folder="public", static_url_path=""` so assets are served at the site root (`/css/style.css`), not under `/static/`.
 
 ## Useful behavior notes
@@ -46,11 +47,17 @@ docker run -it --rm -p 5000:5000 --env-file .env -d --name invest investclaudeco
 - `DEV_LOGIN_EMAIL` — local debug bypass only when `DEBUG=true`
 - `HOST`, `PORT`, `DEBUG` — optional runtime config
 
+## Releases
+- `__version__` in `app.py` is the source of truth; `/healthz` returns it, the Help page shows it, and it must match the top dated section of `CHANGELOG.md`.
+- `.github/workflows/release.yml` runs on push to `main`: if no release exists for the current `__version__`, it tags `vX.Y.Z` and publishes a GitHub Release whose notes are that version's `CHANGELOG.md` section (auto-generated notes as fallback).
+- Cut a release: move `CHANGELOG.md` `[Unreleased]` bullets under `## [X.Y.Z] - DATE`, set `__version__` to match, merge `dev` → `main`.
+- Scheme: MAJOR = deploy needs manual work, MINOR = new feature, PATCH = fixes.
+
 ## Deployment contract
-- Uses `gunicorn app:app` in Render/Procfile/k8s manifests; the Dockerfile runs `python app.py` directly.
+- Uses `gunicorn app:app` in the Procfile and k8s manifests; the Dockerfile runs `python app.py` directly.
 - Health checks must target `/healthz`.
 - Google callback URI must match deployed host: `/auth/google/callback`.
-- Also deployable to Vercel (`vercel.json`) as a single Python serverless function — zero-config, since Vercel loads the top-level `app` Flask instance directly. On Vercel, use Neon's **pooled** connection string for `DATABASE_URL` (elastic instance count vs. Render's fixed worker count), and expect the in-memory caches in `symbols.py`/`blueprints/financials.py` to be less durable (per-instance, not per-process-forever).
+- Also deployable to Vercel (`vercel.json`) as a single Python serverless function — zero-config, since Vercel loads the top-level `app` Flask instance directly. On Vercel, use Neon's **pooled** connection string for `DATABASE_URL` (elastic instance count vs. a fixed worker pool), and expect the in-memory caches in `symbols.py`/`blueprints/financials.py` to be less durable (per-instance, not per-process-forever).
 
 ## Important conventions for AI agents
 - Preserve user-specific config separation: per-user watch lists are stored in `user_config`, global app defaults are in `app_config`.

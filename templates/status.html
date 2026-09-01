@@ -2,7 +2,17 @@
 {% block title %}Portfolio{% endblock %}
 {% block content %}
 <h1>Portfolio Status</h1>
-<p class="page-subtitle">Your watch list with live prices and today's change — enter a position to see its value. Click a column header to sort.</p>
+<p class="page-subtitle">Your watch list with live prices and today's change — enter a position to see its value. Toggle symbols below to filter the table, totals, and allocation chart. Click a column header to sort.</p>
+
+{% if not symbols %}
+<p class="empty-list-hint">Your watch list is empty — add symbols from the Price Chart tab.</p>
+{% endif %}
+
+<div class="symbol-chips" id="symbolChips">
+  {% for sym in symbols %}
+  <button type="button" class="chip {{ '' if sym in hidden else 'active' }}" data-symbol="{{ sym }}">{{ sym }}</button>
+  {% endfor %}
+</div>
 
 <div class="status-toolbar">
   <div class="status" id="status"></div>

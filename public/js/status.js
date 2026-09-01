@@ -2,9 +2,31 @@ const statusEl = document.getElementById('status');
 const totalEl = document.getElementById('statusTotal');
 const tbody = document.getElementById('statusBody');
 const table = document.getElementById('statusTable');
+const chipsContainer = document.getElementById('symbolChips');
 const allocationCanvas = document.getElementById('allocationChart');
 const allocationHint = document.getElementById('allocationHint');
 let allocationChart = null;
+
+function selectedSymbols() {
+  return [...chipsContainer.querySelectorAll('.chip.active')].map((c) => c.dataset.symbol);
+}
+
+async function persistSelection(symbol, selected) {
+  try {
+    const resp = await fetch(`/api/status/symbols/${encodeURIComponent(symbol)}`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ selected }),
+    });
+    if (!resp.ok) {
+      const data = await resp.json().catch(() => ({}));
+      throw new Error(data.error || 'Request failed');
+    }
+  } catch (err) {
+    // Non-fatal: the table still reflects the toggle, the choice just didn't save.
+    statusEl.textContent = `Couldn't save the ${symbol} filter: ${err.message}`;
+  }
+}
 
 let rows = [];
 let sortKey = null;
@@ -226,9 +248,19 @@ table.querySelectorAll('th[data-sort]').forEach((th) => {
 });
 
 async function loadStatus() {
+  const symbols = selectedSymbols();
+  if (chipsContainer.querySelector('.chip') && !symbols.length) {
+    rows = [];
+    applySort();
+    render();
+    statusEl.textContent = 'No symbols selected — pick one or more above.';
+    return;
+  }
+
   statusEl.textContent = 'Loading…';
   try {
-    const resp = await fetch('/api/status');
+    const params = new URLSearchParams({ symbols: symbols.join(',') });
+    const resp = await fetch(`/api/status?${params}`);
     const data = await resp.json();
     if (!resp.ok) throw new Error(data.error || 'Request failed');
     rows = data.rows;
@@ -241,5 +273,13 @@ async function loadStatus() {
     statusEl.textContent = `Error: ${err.message}`;
   }
 }
+
+chipsContainer.addEventListener('click', (e) => {
+  const chip = e.target.closest('.chip');
+  if (!chip) return;
+  const selected = chip.classList.toggle('active');
+  persistSelection(chip.dataset.symbol, selected);
+  loadStatus();
+});
 
 loadStatus();

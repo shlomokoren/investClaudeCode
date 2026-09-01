@@ -18,10 +18,10 @@ from datetime import date, datetime, timedelta, timezone
 
 import pandas as pd
 import yfinance as yf
-from flask import Blueprint, jsonify, render_template
+from flask import Blueprint, jsonify, render_template, request
 
 from auth import current_user_id
-from symbols import load_symbols
+from symbols import load_events_hidden, load_symbols, set_events_symbol_hidden
 
 events_bp = Blueprint("events", __name__)
 
@@ -244,11 +244,42 @@ def _symbol_events(symbol):
 
 @events_bp.route("/events")
 def index():
-    return render_template("events.html", active_tab="events")
+    user_id = current_user_id()
+    return render_template(
+        "events.html",
+        active_tab="events",
+        symbols=load_symbols(user_id),
+        hidden=load_events_hidden(user_id),
+    )
+
+
+@events_bp.route("/api/events/symbols/<symbol>", methods=["POST"])
+def api_set_symbol_selected(symbol):
+    """Remember whether a symbol is shown on the Events tab, so the filter
+    survives a refresh or reopening the tab."""
+    user_id = current_user_id()
+    symbol = symbol.strip().upper()
+    if symbol not in load_symbols(user_id):
+        return jsonify({"error": f"{symbol} is not in your list"}), 404
+
+    payload = request.get_json(silent=True) or {}
+    selected = bool(payload.get("selected", True))
+    set_events_symbol_hidden(user_id, symbol, hidden=not selected)
+    return jsonify({"symbol": symbol, "selected": selected})
 
 
 @events_bp.route("/api/events")
 def api_events():
     user_id = current_user_id()
-    rows = [_symbol_events(symbol) for symbol in load_symbols(user_id)]
+    watch_list = load_symbols(user_id)
+
+    requested = request.args.get("symbols", "")
+    selected = [s.strip().upper() for s in requested.split(",") if s.strip()]
+    if selected:
+        symbols = [s for s in selected if s in watch_list]
+    else:
+        hidden = set(load_events_hidden(user_id))
+        symbols = [s for s in watch_list if s not in hidden]
+
+    rows = [_symbol_events(symbol) for symbol in symbols]
     return jsonify({"rows": rows})

@@ -117,10 +117,40 @@ Every target needs `DATABASE_URL`, `SECRET_KEY`, `GOOGLE_CLIENT_ID`, and
 `GOOGLE_CLIENT_SECRET` in its environment, and its own callback URL registered
 with Google. Health checks use `/healthz` because `/` now redirects to login.
 
-- **Render**: [render.yaml](render.yaml) — `gunicorn app:app`, health check on `/healthz`. `SECRET_KEY` is auto-generated (`generateValue: true`); the other three are `sync: false`, so set them in the dashboard.
+- **Vercel**: [vercel.json](vercel.json) — Python runtime, zero-config (Vercel runs the top-level `app` in `app.py` as one serverless function). Set the four values in the project settings and use Neon's *pooled* connection string for `DATABASE_URL`.
 - **Kubernetes / OpenShift**: manifests under [k8s/](k8s/) (namespace, secret, deployment, service, ingress, OpenShift route). All four values come from the `invest-app-db` secret — create it with `kubectl create secret` rather than committing values.
-- **Heroku-style**: [Procfile](Procfile) — same `gunicorn app:app` command; set all four as config vars.
+- **Heroku-style**: [Procfile](Procfile) — `gunicorn app:app`; set all four as config vars.
 
 ## Data source
 
 Stock prices and financial statements come from [yfinance](https://github.com/ranaroussi/yfinance) (Yahoo Finance), fetched on demand. The Financials tab caches responses in memory for 24 hours per symbol/period.
+
+## Releases
+
+The running version is `__version__` in [app.py](app.py); it's also returned by
+`/healthz` (`{"status": "ok", "version": "..."}`) and shown at the bottom of the
+Help page. It matches the top dated section of [CHANGELOG.md](CHANGELOG.md) and
+the `vX.Y.Z` git tag.
+
+Versioning is `MAJOR.MINOR.PATCH`:
+
+| Bump | When | e.g. |
+|------|------|------|
+| MAJOR | A deploy needs manual work | DB migration, renamed/removed env var, auth change, redesign |
+| MINOR | New backward-compatible feature | a new tab or endpoint |
+| PATCH | Fixes and polish only | bug fixes, copy, styling, refactors |
+
+**To cut a release:**
+
+1. In `CHANGELOG.md`, rename `## [Unreleased]` to `## [X.Y.Z] - YYYY-MM-DD` and add a fresh empty `[Unreleased]` above it.
+2. Set `__version__` in `app.py` to the same `X.Y.Z`.
+3. Merge `dev` → `main`.
+
+The [Release workflow](.github/workflows/release.yml) then tags the merge commit
+`vX.Y.Z` and publishes a GitHub Release, using that `CHANGELOG.md` section as the
+notes (it falls back to auto-generated notes if the section is missing). Merging
+to `main` without bumping `__version__` is a no-op — the release for that version
+already exists.
+
+`git describe --tags` gives an interim version between releases
+(`v2.1.0-7-gabc1234`).
