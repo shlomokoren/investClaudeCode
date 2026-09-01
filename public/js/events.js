@@ -1,6 +1,28 @@
 const statusEl = document.getElementById('status');
 const tbody = document.getElementById('eventsBody');
 const table = document.getElementById('eventsTable');
+const chipsContainer = document.getElementById('symbolChips');
+
+function selectedSymbols() {
+  return [...chipsContainer.querySelectorAll('.chip.active')].map((c) => c.dataset.symbol);
+}
+
+async function persistSelection(symbol, selected) {
+  try {
+    const resp = await fetch(`/api/events/symbols/${encodeURIComponent(symbol)}`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ selected }),
+    });
+    if (!resp.ok) {
+      const data = await resp.json().catch(() => ({}));
+      throw new Error(data.error || 'Request failed');
+    }
+  } catch (err) {
+    // Non-fatal: the table still reflects the toggle, the choice just didn't save.
+    statusEl.textContent = `Couldn't save the ${symbol} filter: ${err.message}`;
+  }
+}
 
 let rows = [];
 let sortKey = null;
@@ -185,9 +207,18 @@ table.querySelectorAll('th[data-sort]').forEach((th) => {
 });
 
 async function loadEvents() {
+  const symbols = selectedSymbols();
+  if (chipsContainer.querySelector('.chip') && !symbols.length) {
+    rows = [];
+    render();
+    statusEl.textContent = 'No symbols selected — pick one or more above.';
+    return;
+  }
+
   statusEl.textContent = 'Loading…';
   try {
-    const resp = await fetch('/api/events');
+    const params = new URLSearchParams({ symbols: symbols.join(',') });
+    const resp = await fetch(`/api/events?${params}`);
     const data = await resp.json();
     if (!resp.ok) throw new Error(data.error || 'Request failed');
     rows = data.rows;
@@ -200,5 +231,13 @@ async function loadEvents() {
     statusEl.textContent = `Error: ${err.message}`;
   }
 }
+
+chipsContainer.addEventListener('click', (e) => {
+  const chip = e.target.closest('.chip');
+  if (!chip) return;
+  const selected = chip.classList.toggle('active');
+  persistSelection(chip.dataset.symbol, selected);
+  loadEvents();
+});
 
 loadEvents();

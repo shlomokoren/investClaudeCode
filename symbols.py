@@ -79,6 +79,7 @@ def remove_symbol(user_id: int, symbol: str) -> list:
     db.remove_user_symbol(user_id, symbol, key=db.DISABLED_SYMBOLS_KEY)
     db.remove_user_symbol(user_id, symbol, key=db.NEWS_HIDDEN_KEY)
     db.remove_user_symbol(user_id, symbol, key=db.PORTFOLIO_HIDDEN_KEY)
+    db.remove_user_symbol(user_id, symbol, key=db.EVENTS_HIDDEN_KEY)
     db.remove_user_position(user_id, symbol)
     return db.remove_user_symbol(user_id, symbol)
 
@@ -126,6 +127,21 @@ def set_portfolio_symbol_hidden(user_id: int, symbol: str, hidden: bool) -> bool
         db.add_user_symbol(user_id, symbol, key=db.PORTFOLIO_HIDDEN_KEY)
     else:
         db.remove_user_symbol(user_id, symbol, key=db.PORTFOLIO_HIDDEN_KEY)
+    return hidden
+
+
+def load_events_hidden(user_id: int) -> list:
+    """Watch-list tickers the user has filtered *out* of the Events tab.
+    Stores opt-outs, same as [[load_news_hidden]] / [[load_portfolio_hidden]]."""
+    return db.read_user_config(user_id).get(db.EVENTS_HIDDEN_KEY, [])
+
+
+def set_events_symbol_hidden(user_id: int, symbol: str, hidden: bool) -> bool:
+    """Persist a symbol's Events-tab visibility. Returns the new hidden state."""
+    if hidden:
+        db.add_user_symbol(user_id, symbol, key=db.EVENTS_HIDDEN_KEY)
+    else:
+        db.remove_user_symbol(user_id, symbol, key=db.EVENTS_HIDDEN_KEY)
     return hidden
 
 
