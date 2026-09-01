@@ -331,6 +331,13 @@ body.login-page .page {
   font-size: 14px;
 }
 
+.help-version {
+  margin: 1.5rem 0 0;
+  text-align: right;
+  font-size: 12px;
+  color: #98a2b3;
+}
+
 .help-step {
   display: flex;
   gap: 1rem;

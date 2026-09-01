@@ -124,3 +124,27 @@ with Google. Health checks use `/healthz` because `/` now redirects to login.
 ## Data source
 
 Stock prices and financial statements come from [yfinance](https://github.com/ranaroussi/yfinance) (Yahoo Finance), fetched on demand. The Financials tab caches responses in memory for 24 hours per symbol/period.
+
+## Releases
+
+The running version is `__version__` in [app.py](app.py); it's also returned by
+`/healthz` (`{"status": "ok", "version": "..."}`) and shown at the bottom of the
+Help page. Keep it in step with the matching `vX.Y.Z` git tag.
+
+Versioning is `MAJOR.MINOR.PATCH`:
+
+| Bump | When | e.g. |
+|------|------|------|
+| MAJOR | A deploy needs manual work | DB migration, renamed/removed env var, auth change, redesign |
+| MINOR | New backward-compatible feature | a new tab or endpoint |
+| PATCH | Fixes and polish only | bug fixes, copy, styling, refactors |
+
+To cut a release: bump `__version__`, merge to `main`, then
+
+```bash
+git tag -a v2.1.0 -m "short summary of what shipped"
+git push origin v2.1.0
+```
+
+`git describe --tags` gives an interim version between releases
+(`v2.0.0-7-gabc1234`).
