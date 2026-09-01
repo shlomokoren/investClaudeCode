@@ -47,6 +47,11 @@ docker run -it --rm -p 5000:5000 --env-file .env -d --name invest investclaudeco
 - `DEV_LOGIN_EMAIL` — local debug bypass only when `DEBUG=true`
 - `HOST`, `PORT`, `DEBUG` — optional runtime config
 
+## Releases
+- `__version__` in `app.py` is the source of truth; `/healthz` returns it and the Help page shows it.
+- `.github/workflows/release.yml` runs on push to `main`: if no release exists for the current `__version__`, it tags `vX.Y.Z` and publishes a GitHub Release. Cut a release by bumping `__version__` and merging `dev` → `main`.
+- Scheme: MAJOR = deploy needs manual work, MINOR = new feature, PATCH = fixes.
+
 ## Deployment contract
 - Uses `gunicorn app:app` in Render/Procfile/k8s manifests; the Dockerfile runs `python app.py` directly.
 - Health checks must target `/healthz`.

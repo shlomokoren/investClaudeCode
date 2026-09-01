@@ -1,0 +1,50 @@
+name: Release
+
+# When work lands on main (i.e. a dev -> main merge), publish a GitHub
+# Release for the version declared in app.py. If a release for that
+# version already exists nothing happens, so merging to main without
+# bumping __version__ is a safe no-op. Bump __version__ in the same
+# change you merge and the release shows up on the repo page by itself.
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:  # allow a manual run from the Actions tab
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Read version from app.py
+        id: v
+        run: |
+          version=$(grep -oP '__version__\s*=\s*"\K[^"]+' app.py)
+          if [ -z "$version" ]; then
+            echo "::error::Could not find __version__ in app.py"
+            exit 1
+          fi
+          echo "version=$version" >> "$GITHUB_OUTPUT"
+          echo "app.py version: $version"
+
+      - name: Release v${{ steps.v.outputs.version }} if it is new
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          tag="v${{ steps.v.outputs.version }}"
+          if gh release view "$tag" >/dev/null 2>&1; then
+            echo "Release $tag already exists — nothing to do."
+            exit 0
+          fi
+          echo "Creating release $tag"
+          gh release create "$tag" \
+            --target "${{ github.sha }}" \
+            --title "$tag" \
+            --generate-notes \
+            --latest

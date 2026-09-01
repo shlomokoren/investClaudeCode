@@ -139,12 +139,11 @@ Versioning is `MAJOR.MINOR.PATCH`:
 | MINOR | New backward-compatible feature | a new tab or endpoint |
 | PATCH | Fixes and polish only | bug fixes, copy, styling, refactors |
 
-To cut a release: bump `__version__`, merge to `main`, then
-
-```bash
-git tag -a v2.1.0 -m "short summary of what shipped"
-git push origin v2.1.0
-```
+To cut a release: **bump `__version__` and merge `dev` → `main`.** The
+[Release workflow](.github/workflows/release.yml) then tags the merge commit
+`vX.Y.Z` and publishes a GitHub Release with auto-generated notes, which shows
+up in the repo's Releases section. Merging to `main` without bumping
+`__version__` is a no-op (the release for that version already exists).
 
 `git describe --tags` gives an interim version between releases
 (`v2.0.0-7-gabc1234`).
