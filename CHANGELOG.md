@@ -1,20 +1,12 @@
 # Changelog
 
-All notable, user-visible changes to Invest Dashboard are recorded here.
+All notable, user-visible changes to Invest Dashboard.
 
-The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
-and the project uses [Semantic Versioning](https://semver.org/) — see
-[README → Releases](README.md#releases) for what MAJOR / MINOR / PATCH mean here.
-
-While working, add bullets under **[Unreleased]**. To cut a release, rename
-that heading to `## [X.Y.Z] - YYYY-MM-DD`, start a fresh empty `[Unreleased]`,
-set `__version__` in `app.py` to match, and merge `dev` → `main` — the release
-workflow publishes a GitHub Release using the matching section below as its notes.
-
-## [Unreleased]
-
-### Removed
-- Render deployment config (`render.yaml`) and its documentation — the app deploys on Vercel now. Procfile, k8s, and Docker configs are unchanged.
+This file is generated from commit messages by [git-cliff](https://git-cliff.org)
+when a release is published — **do not edit it by hand.** For clean grouping,
+start each commit summary with a verb (`Add`, `Fix`, `Remove`, `Change`) or a
+Conventional Commits prefix (`feat:`, `fix:`). The version number is set by
+hand in `app.py` (`__version__`); see [README → Releases](README.md#releases).
 
 ## [2.1.0] - 2026-09-01
 

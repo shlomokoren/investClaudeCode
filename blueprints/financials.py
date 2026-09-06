@@ -57,6 +57,40 @@ def _extract_row(df, labels):
     return None
 
 
+# Income-statement rows used to decide whether a period column carries real
+# data. EPS is deliberately excluded: yfinance adds a column for the newest
+# quarter as soon as its EPS is out, before Yahoo has ingested the revenue
+# and profit lines, and a quarter with only EPS looks like zero revenue on
+# every other chart.
+_CORE_MONEY_METRICS = ("total_revenue", "gross_profit", "operating_income", "net_income")
+
+
+def _trim_blank_periods(df):
+    """Drop leading and trailing period columns that have no income-statement
+    figures — yfinance pads the oldest quarter with an all-blank column and
+    adds the newest quarter before its numbers land, both of which otherwise
+    render as an axis label with no bar. Interior gaps are left as-is."""
+    money_rows = [
+        label
+        for key in _CORE_MONEY_METRICS
+        for label in METRIC_LABELS[key]
+        if label in df.index
+    ]
+    if not money_rows:
+        return df
+
+    populated = [
+        any(_clean_value(df.loc[label].iloc[i]) is not None for label in money_rows)
+        for i in range(df.shape[1])
+    ]
+    if not any(populated):
+        return df.iloc[:, :0]
+
+    first = populated.index(True)
+    last = len(populated) - 1 - populated[::-1].index(True)
+    return df.iloc[:, first : last + 1]
+
+
 def _period_label(date, period):
     if period == "quarterly":
         quarter = (date.month - 1) // 3 + 1
@@ -107,6 +141,9 @@ def _fetch_financials(symbol, period):
     # yfinance documents columns as newest-first; sort explicitly ascending
     # by date so we don't depend on that ordering holding for every ticker.
     df = df.sort_index(axis=1, ascending=True)
+    df = _trim_blank_periods(df)
+    if df.empty:
+        return None
 
     logger.info("Income statement rows for %s (%s): %s", symbol, period, list(df.index))
 

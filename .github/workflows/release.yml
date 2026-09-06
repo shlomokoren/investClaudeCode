@@ -1,21 +1,25 @@
 name: Release
 
-# When work lands on main (i.e. a dev -> main merge), publish a GitHub
-# Release for the version declared in app.py, using the matching section
-# of CHANGELOG.md as the release notes. If a release for that version
-# already exists nothing happens, so merging to main without bumping
-# __version__ is a safe no-op.
+# On a dev -> main merge, publish a GitHub Release for the version in
+# app.py (__version__). git-cliff regenerates the new version's section of
+# CHANGELOG.md from the commit messages since the last tag, commits the
+# updated file back to main, and that section becomes the release notes.
+# If a release for the current version already exists, nothing happens —
+# so merging to main without bumping __version__ is a safe no-op.
 #
-# To cut a release: move the CHANGELOG "[Unreleased]" bullets under a new
-# "## [X.Y.Z] - DATE" heading, set __version__ to match, and merge to main.
+# To cut a release: bump __version__ in app.py and merge dev -> main.
+# Write commit summaries starting with a verb (Add / Fix / Remove / Change)
+# or a Conventional Commits prefix (feat: / fix:) so git-cliff groups them.
 
 on:
   push:
     branches: [main]
-  workflow_dispatch:  # allow a manual run from the Actions tab
+  workflow_dispatch:
 
 permissions:
   contents: write
+
+concurrency: release  # never run two releases at once
 
 jobs:
   release:
@@ -34,40 +38,55 @@ jobs:
             exit 1
           fi
           echo "version=$version" >> "$GITHUB_OUTPUT"
-          echo "app.py version: $version"
+          echo "tag=v$version"   >> "$GITHUB_OUTPUT"
+          echo "Version: $version"
 
-      - name: Build release notes from CHANGELOG.md
-        id: notes
-        run: |
-          version="${{ steps.v.outputs.version }}"
-          # Print the lines between "## [version]" and the next "## [" heading.
-          awk -v prefix="## [$version]" '
-            index($0, prefix) == 1 { flag = 1; next }
-            flag && /^## \[/        { exit }
-            flag                    { print }
-          ' CHANGELOG.md | sed '/./,$!d' > notes.md
-          if [ -s notes.md ]; then
-            echo "have_notes=true" >> "$GITHUB_OUTPUT"
-            echo "Using CHANGELOG.md section for v$version:"; cat notes.md
-          else
-            echo "have_notes=false" >> "$GITHUB_OUTPUT"
-            echo "No CHANGELOG.md section for v$version — will auto-generate notes."
-          fi
-
-      - name: Release v${{ steps.v.outputs.version }} if it is new
+      - name: Skip if this release already exists
+        id: gate
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          tag="v${{ steps.v.outputs.version }}"
-          if gh release view "$tag" >/dev/null 2>&1; then
-            echo "Release $tag already exists — nothing to do."
-            exit 0
-          fi
-          echo "Creating release $tag"
-          if [ "${{ steps.notes.outputs.have_notes }}" = "true" ]; then
-            gh release create "$tag" --target "${{ github.sha }}" \
-              --title "$tag" --notes-file notes.md --latest
+          if gh release view "${{ steps.v.outputs.tag }}" >/dev/null 2>&1; then
+            echo "go=false" >> "$GITHUB_OUTPUT"
+            echo "Release ${{ steps.v.outputs.tag }} already exists — nothing to do."
           else
-            gh release create "$tag" --target "${{ github.sha }}" \
-              --title "$tag" --generate-notes --latest
+            echo "go=true" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Install git-cliff
+        if: steps.gate.outputs.go == 'true'
+        run: |
+          pipx install git-cliff==2.10.1
+          git-cliff --version
+
+      - name: Update CHANGELOG.md and build release notes
+        if: steps.gate.outputs.go == 'true'
+        run: |
+          tag="${{ steps.v.outputs.tag }}"
+          git-cliff --tag "$tag" --unreleased --prepend CHANGELOG.md
+          perl -0pi -e 's/\n{3,}/\n\n/g; s/\s+\z/\n/' CHANGELOG.md   # tidy blank runs
+          git-cliff --tag "$tag" --unreleased | sed '1,/^## \[/d; /./,$!d' > notes.md
+          echo "----- release notes -----"; cat notes.md
+
+      - name: Commit the updated CHANGELOG.md
+        if: steps.gate.outputs.go == 'true'
+        run: |
+          git config user.name  "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          if ! git diff --quiet CHANGELOG.md; then
+            git add CHANGELOG.md
+            git commit -m "docs: update CHANGELOG for ${{ steps.v.outputs.tag }} [skip ci]"
+            git push origin HEAD:main
+          fi
+
+      - name: Publish the release
+        if: steps.gate.outputs.go == 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          tag="${{ steps.v.outputs.tag }}"
+          if [ -s notes.md ]; then
+            gh release create "$tag" --target main --title "$tag" --notes-file notes.md --latest
+          else
+            gh release create "$tag" --target main --title "$tag" --generate-notes --latest
           fi

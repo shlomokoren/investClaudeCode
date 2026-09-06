@@ -8,7 +8,7 @@ import auth
 # release (see the README): MAJOR for a deploy that needs manual work,
 # MINOR for a new feature, PATCH for fixes. Keep this in step with the
 # top dated section in CHANGELOG.md and the `vX.Y.Z` git tag.
-__version__ = "2.1.0"
+__version__ = "2.1.1"
 from blueprints.events import events_bp
 from blueprints.financials import financials_bp
 from blueprints.news import news_bp
