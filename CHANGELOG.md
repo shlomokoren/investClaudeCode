@@ -13,6 +13,8 @@ workflow publishes a GitHub Release using the matching section below as its note
 
 ## [Unreleased]
 
+## [2.1.1] - 2026-09-06
+
 ### Fixed
 - Financials tab no longer shows an empty labelled column for a quarter yfinance hasn't populated yet (or its blank oldest-quarter padding) — leading/trailing periods with no revenue/profit figures are trimmed.
 
