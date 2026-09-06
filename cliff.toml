@@ -1,0 +1,64 @@
+# git-cliff configuration — the release workflow runs this to regenerate
+# CHANGELOG.md from commit messages when a version is published.
+# Reference: https://git-cliff.org/docs/configuration
+
+[changelog]
+header = """
+# Changelog
+
+All notable, user-visible changes to Invest Dashboard.
+
+This file is generated from commit messages by [git-cliff](https://git-cliff.org)
+when a release is published — **do not edit it by hand.** For clean grouping,
+start each commit summary with a verb (`Add`, `Fix`, `Remove`, `Change`) or a
+Conventional Commits prefix (`feat:`, `fix:`). The version number is set by
+hand in `app.py` (`__version__`); see [README → Releases](README.md#releases).
+"""
+
+body = """
+{% if version %}## [{{ version | trim_start_matches(pat="v") }}] - {{ timestamp | date(format="%Y-%m-%d") }}{% else %}## [Unreleased]{% endif %}
+{% for group, commits in commits | group_by(attribute="group") %}
+### {{ group | upper_first }}
+{% for commit in commits %}
+- {{ commit.message | split(pat="\n") | first | upper_first | trim }}
+{%- endfor %}
+{% endfor %}
+
+"""
+
+trim = false
+footer = ""
+
+[git]
+conventional_commits = false
+filter_unconventional = false
+split_commits = false
+filter_commits = true
+tag_pattern = "v[0-9]*"
+topo_order = false
+sort_commits = "newest"
+
+commit_parsers = [
+  # Optional Conventional Commits prefixes, for precise control.
+  { message = "^feat", group = "Added" },
+  { message = "^fix", group = "Fixed" },
+  { message = "^perf|^refactor|^style", group = "Changed" },
+  { message = "^chore|^ci|^build|^test|^docs", skip = true },
+
+  # This project's usual style: a verb-led summary.
+  { message = "(?i)^(add|introduce|create|support)\\b", group = "Added" },
+  { message = "(?i)^(fix|correct|resolve|prevent|handle|guard|trim)\\b", group = "Fixed" },
+  { message = "(?i)^(remove|delete|drop)\\b", group = "Removed" },
+  { message = "(?i)^security\\b|CVE-", group = "Security" },
+
+  # Noise that should never appear in the changelog.
+  { message = "(?i)^merge ", skip = true },
+  { message = "(?i)^release ", skip = true },
+  { message = "(?i)^bump version", skip = true },
+  { message = "(?i)update changelog", skip = true },
+  { message = "^test1$", skip = true },
+  { message = "(?i)^debug", skip = true },
+
+  # Anything else is a change worth listing.
+  { message = ".*", group = "Changed" },
+]

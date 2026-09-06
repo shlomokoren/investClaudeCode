@@ -48,9 +48,10 @@ docker run -it --rm -p 5000:5000 --env-file .env -d --name invest investclaudeco
 - `HOST`, `PORT`, `DEBUG` — optional runtime config
 
 ## Releases
-- `__version__` in `app.py` is the source of truth; `/healthz` returns it, the Help page shows it, and it must match the top dated section of `CHANGELOG.md`.
-- `.github/workflows/release.yml` runs on push to `main`: if no release exists for the current `__version__`, it tags `vX.Y.Z` and publishes a GitHub Release whose notes are that version's `CHANGELOG.md` section (auto-generated notes as fallback).
-- Cut a release: move `CHANGELOG.md` `[Unreleased]` bullets under `## [X.Y.Z] - DATE`, set `__version__` to match, merge `dev` → `main`.
+- `__version__` in `app.py` is the source of truth; `/healthz` returns it and the Help page shows it.
+- `.github/workflows/release.yml` runs on push to `main`: if no release exists for the current `__version__`, git-cliff (`cliff.toml`) builds that version's `CHANGELOG.md` section from commit messages, commits it back to `main`, tags `vX.Y.Z`, and publishes the GitHub Release with it as the notes.
+- Cut a release: bump `__version__`, merge `dev` → `main`. That's the only manual step.
+- **Never hand-edit `CHANGELOG.md`** — it's generated. Write commit summaries starting with a verb (`Add`/`Fix`/`Remove`/`Change`) or `feat:`/`fix:`.
 - Scheme: MAJOR = deploy needs manual work, MINOR = new feature, PATCH = fixes.
 
 ## Deployment contract
