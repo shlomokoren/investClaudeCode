@@ -8,6 +8,16 @@ start each commit summary with a verb (`Add`, `Fix`, `Remove`, `Change`) or a
 Conventional Commits prefix (`feat:`, `fix:`). The version number is set by
 hand in `app.py` (`__version__`); see [README → Releases](README.md#releases).
 
+## [2.1.1] - 2026-09-06
+
+### Changed
+
+- Generate CHANGELOG.md from commits with git-cliff
+
+### Fixed
+
+- Trim empty edge periods from the Financials charts
+
 ## [2.1.0] - 2026-09-01
 
 ### Added
