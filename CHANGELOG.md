@@ -13,6 +13,9 @@ workflow publishes a GitHub Release using the matching section below as its note
 
 ## [Unreleased]
 
+### Fixed
+- Financials tab no longer shows an empty labelled column for a quarter yfinance hasn't populated yet (or its blank oldest-quarter padding) — leading/trailing periods with no revenue/profit figures are trimmed.
+
 ### Removed
 - Render deployment config (`render.yaml`) and its documentation — the app deploys on Vercel now. Procfile, k8s, and Docker configs are unchanged.
 
